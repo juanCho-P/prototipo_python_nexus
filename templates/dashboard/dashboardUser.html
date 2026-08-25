@@ -1,0 +1,308 @@
+{% extends 'base.html' %}
+
+{% block title %}
+Dashboard
+{% endblock %}
+
+
+{% block content %}
+
+<div class="dashboard">
+
+    <!-- =========================
+         ENCABEZADO
+    ========================== -->
+
+    <div class="dashboard-header">
+
+        <div>
+
+            <h1>
+                Bienvenido, {{ request.user.nombres }}
+                👋
+            </h1>
+
+            <p>
+                Aquí tienes un resumen de tu actividad en Nexus.
+            </p>
+
+        </div>
+
+    </div>
+
+
+    <!-- =========================
+         ESTADÍSTICAS
+    ========================== -->
+
+    <div class="stats-grid">
+
+
+        <!-- EVENTOS -->
+
+        <div class="stat-card">
+
+            <div class="stat-icon purple">
+                <i class="fa-solid fa-calendar-days"></i>
+            </div>
+
+            <div class="stat-info">
+
+                <span class="stat-number">
+                    {{ total_eventos }}
+                </span>
+
+                <span class="stat-label">
+                    Eventos creados
+                </span>
+
+            </div>
+
+        </div>
+
+
+        <!-- FOROS -->
+
+        <div class="stat-card">
+
+            <div class="stat-icon blue">
+                <i class="fa-solid fa-comments"></i>
+            </div>
+
+            <div class="stat-info">
+
+                <span class="stat-number">
+                    {{ total_foros }}
+                </span>
+
+                <span class="stat-label">
+                    Foros creados
+                </span>
+
+            </div>
+
+        </div>
+
+
+        <!-- ASISTENTES -->
+
+        <div class="stat-card">
+
+            <div class="stat-icon cyan">
+                <i class="fa-solid fa-users"></i>
+            </div>
+
+            <div class="stat-info">
+
+                <span class="stat-number">
+                    {{ total_asistentes }}
+                </span>
+
+                <span class="stat-label">
+                    Asistentes a tus eventos
+                </span>
+
+            </div>
+
+        </div>
+
+    </div>
+
+
+    <!-- =========================
+         MIS EVENTOS
+    ========================== -->
+
+    <section class="dashboard-section">
+
+        <div class="section-header">
+
+            <div>
+
+                <h2>
+                    Mis eventos
+                </h2>
+
+                <p>
+                    Eventos que has creado.
+                </p>
+
+            </div>
+
+            <a
+                href="{% url 'crear_evento' %}"
+                class="primary-button"
+            >
+                <i class="fa-solid fa-plus"></i>
+                Crear evento
+            </a>
+
+        </div>
+
+
+        {% if eventos %}
+
+            <div class="event-table">
+
+                <div class="table-header">
+
+                    <span>Título</span>
+                    <span>Fecha</span>
+                    <span>Ubicación</span>
+                    <span>Asistentes</span>
+
+                </div>
+
+
+                {% for evento in eventos %}
+
+                    <div class="table-row">
+
+                        <span class="event-title">
+                            {{ evento.titulo }}
+                        </span>
+
+                        <span>
+                            {{ evento.fecha_hora_inicio|date:"d/m/Y H:i" }}
+                        </span>
+
+                        <span>
+                            {{ evento.ubicacion }}
+                        </span>
+
+                        <span>
+                            {{ evento.asistentes.count }}
+                        </span>
+
+                    </div>
+
+                {% endfor %}
+
+            </div>
+
+        {% else %}
+
+            <div class="empty-state">
+
+                <i class="fa-regular fa-calendar"></i>
+
+                <h3>
+                    Todavía no tienes eventos
+                </h3>
+
+                <p>
+                    Crea tu primer evento y comienza a conectar
+                    con otras personas.
+                </p>
+
+                <a
+                    href="{% url 'crear_evento' %}"
+                    class="primary-button"
+                >
+                    Crear mi primer evento
+                </a>
+
+            </div>
+
+        {% endif %}
+
+    </section>
+
+
+    <!-- =========================
+         MIS FOROS
+    ========================== -->
+
+    <section class="dashboard-section">
+
+        <div class="section-header">
+
+            <div>
+
+                <h2>
+                    Mis foros
+                </h2>
+
+                <p>
+                    Comunidades que has creado.
+                </p>
+
+            </div>
+
+            <a
+                href="#"
+                class="primary-button"
+            >
+                <i class="fa-solid fa-plus"></i>
+                Crear foro
+            </a>
+
+        </div>
+
+
+        {% if foros %}
+
+            <div class="forum-grid">
+
+                {% for foro in foros %}
+
+                    <article class="forum-card">
+
+                        <div class="forum-card-icon">
+
+                            <i class="fa-solid fa-comments"></i>
+
+                        </div>
+
+                        <h3>
+                            {{ foro.titulo }}
+                        </h3>
+
+                        <p>
+                            {{ foro.descripcion|truncatechars:100 }}
+                        </p>
+
+                        <a
+                            href="#"
+                            class="card-link"
+                        >
+                            Ver foro
+                            <i class="fa-solid fa-arrow-right"></i>
+                        </a>
+
+                    </article>
+
+                {% endfor %}
+
+            </div>
+
+        {% else %}
+
+            <div class="empty-state">
+
+                <i class="fa-regular fa-comments"></i>
+
+                <h3>
+                    Todavía no tienes foros
+                </h3>
+
+                <p>
+                    Crea un foro para comenzar una comunidad.
+                </p>
+
+                <a
+                    href="#"
+                    class="primary-button"
+                >
+                    Crear mi primer foro
+                </a>
+
+            </div>
+
+        {% endif %}
+
+    </section>
+
+</div>
+
+{% endblock %}

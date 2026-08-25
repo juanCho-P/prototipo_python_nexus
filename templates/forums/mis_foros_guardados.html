@@ -1,0 +1,60 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}Mis Foros Guardados - Nexus{% endblock %}
+
+{% block extra_css %}
+<link rel="stylesheet" href="{% static 'buscar_foro.css' %}">
+{% endblock %}
+
+{% block content %}
+<div class="forum-detail-full-container" style="max-width: 1000px; margin: 0 auto; padding: 2rem 1rem;">
+    
+    <div style="margin-bottom: 2rem;">
+        <h1 class="search-title" style="text-align: left; margin-bottom: 0.5rem;">
+            <i class="fa-solid fa-bookmark" style="color: var(--color-primary);"></i> Mis Foros Guardados
+        </h1>
+        <p class="search-subtitle" style="text-align: left;">
+            Accede rápidamente a las discusiones que has marcado como favoritas.
+        </p>
+    </div>
+
+    <div class="forum-list">
+        {% for item in foros_guardados %}
+            <div class="forum-card" style="background: var(--color-surface); border: 1px solid var(--color-border); border-radius: var(--radius-medium); padding: 1.5rem; margin-bottom: 1rem; display: flex; justify-content: space-between; align-items: center; gap: 1rem;">
+                <div style="flex: 1;">
+                    <div style="display: flex; gap: 0.5rem; margin-bottom: 0.5rem;">
+                        {% for cat in item.foro.categoria.all %}
+                            <span class="category-badge">{{ cat.nombre }}</span>
+                        {% endfor %}
+                    </div>
+                    <h2 style="font-size: 1.2rem; margin-bottom: 0.5rem;">
+                        <a href="{% url 'foro_detalle' item.foro.id %}" style="color: var(--color-text-primary); text-decoration: none;">
+                            {{ item.foro.titulo }}
+                        </a>
+                    </h2>
+                    <p style="color: var(--color-text-secondary); font-size: 0.9rem; margin: 0;">
+                        Guardado el {{ item.created_at|date:"d/m/Y" }} • Creado por {{ item.foro.id_creador.username|default:"Usuario" }}
+                    </p>
+                </div>
+
+                <div style="display: flex; gap: 0.5rem; align-items: center;">
+                    <a href="{% url 'foro_detalle' item.foro.id %}" class="search-btn" style="position: static; padding: 0.5rem 1rem; text-decoration: none; display: inline-block;">
+                        Ver Foro
+                    </a>
+                    <a href="{% url 'guardar_foro_toggle' item.foro.id %}" class="btn-action-link danger" style="padding: 0.5rem; border: 1px solid var(--color-border); border-radius: var(--radius-small);" title="Quitar de guardados">
+                        <i class="fa-solid fa-trash"></i>
+                    </a>
+                </div>
+            </div>
+        {% empty %}
+            <div style="text-align: center; padding: 3rem 1rem; background: var(--color-surface); border-radius: var(--radius-medium); border: 1px dashed var(--color-border);">
+                <i class="fa-regular fa-bookmark" style="font-size: 2.5rem; color: var(--color-text-secondary); margin-bottom: 1rem;"></i>
+                <p style="color: var(--color-text-secondary); font-size: 1.1rem; margin-bottom: 1rem;">No tienes ningún foro guardado aún.</p>
+                <a href="{% url 'buscar_foro' %}" class="search-btn" style="position: static; text-decoration: none; display: inline-block;">Explorar Foros</a>
+            </div>
+        {% endfor %}
+    </div>
+
+</div>
+{% endblock %}

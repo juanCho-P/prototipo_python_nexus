@@ -1,0 +1,767 @@
+/* ============================================================
+   CREAR / EDITAR EVENTO
+   ============================================================ */
+
+.form-container-stellar {
+
+    display: flex;
+
+    justify-content: center;
+
+    width: 100%;
+
+    padding: 30px 20px 50px;
+
+}
+
+
+/* ============================================================
+   TARJETA
+   ============================================================ */
+
+.form-card-stellar {
+
+    width: 100%;
+
+    max-width: 760px;
+
+    background: var(--color-surface);
+
+    border: 1px solid var(--color-border);
+
+    border-radius: var(--radius-large);
+
+    box-shadow: var(--shadow-card);
+
+    padding: 35px;
+
+}
+
+
+/* ============================================================
+   ENCABEZADO
+   ============================================================ */
+
+.form-header-stellar {
+
+    display: flex;
+
+    align-items: center;
+
+    gap: 15px;
+
+    margin-bottom: 30px;
+
+}
+
+
+.form-header-icon {
+
+    width: 50px;
+
+    height: 50px;
+
+    display: flex;
+
+    align-items: center;
+
+    justify-content: center;
+
+    border-radius: var(--radius-medium);
+
+    background: var(--gradient-primary);
+
+    color: white;
+
+    font-size: 1.3rem;
+
+    box-shadow: var(--shadow-button);
+
+}
+
+
+.form-title-stellar {
+
+    margin: 0;
+
+    color: var(--color-text-primary);
+
+    font-size: 1.5rem;
+
+    font-weight: 700;
+
+}
+
+
+.form-subtitle-stellar {
+
+    margin: 5px 0 0;
+
+    color: var(--color-text-secondary);
+
+    font-size: 0.9rem;
+
+}
+
+
+/* ============================================================
+   FORMULARIO
+   ============================================================ */
+
+.stellar-form {
+
+    display: flex;
+
+    flex-direction: column;
+
+    gap: 20px;
+
+}
+
+
+.form-group-stellar {
+
+    display: flex;
+
+    flex-direction: column;
+
+    gap: 7px;
+
+}
+
+
+.form-label-stellar {
+
+    color: var(--color-text-primary);
+
+    font-size: 0.88rem;
+
+    font-weight: 600;
+
+}
+
+
+/* ============================================================
+   IMAGEN
+   ============================================================ */
+
+.image-upload-section {
+
+    display: flex;
+
+    flex-direction: column;
+
+    gap: 8px;
+
+}
+
+
+.image-preview-container {
+
+    display: flex;
+
+    flex-direction: column;
+
+    gap: 12px;
+
+}
+
+
+/*
+   Contenedor de la imagen.
+
+   IMPORTANTE:
+   Aquí limitamos el tamaño de la imagen.
+*/
+
+.image-preview {
+
+    width: 100%;
+
+    height: 260px;
+
+    overflow: hidden;
+
+    border-radius: var(--radius-medium);
+
+    border: 1px solid var(--color-border);
+
+    background: var(--color-background);
+
+    display: flex;
+
+    align-items: center;
+
+    justify-content: center;
+
+}
+
+
+/*
+   La imagen nunca podrá romper el contenedor.
+*/
+
+.image-preview img {
+
+    width: 100%;
+
+    height: 100%;
+
+    object-fit: cover;
+
+    display: block;
+
+}
+
+
+/*
+   Placeholder
+*/
+
+.image-preview-placeholder {
+
+    display: flex;
+
+    flex-direction: column;
+
+    align-items: center;
+
+    justify-content: center;
+
+    gap: 10px;
+
+    color: var(--color-text-secondary);
+
+}
+
+
+.image-preview-placeholder i {
+
+    font-size: 2.5rem;
+
+    color: var(--color-primary);
+
+}
+
+
+.image-preview-placeholder span {
+
+    font-size: 0.85rem;
+
+}
+
+
+/* ============================================================
+   INPUT FILE
+   ============================================================ */
+
+.file-upload-stellar {
+
+    position: relative;
+
+}
+
+
+.file-upload-stellar input[type="file"] {
+
+    display: none;
+
+}
+
+
+.file-upload-btn-stellar {
+
+    width: 100%;
+
+    min-height: 48px;
+
+    display: flex;
+
+    align-items: center;
+
+    justify-content: center;
+
+    gap: 9px;
+
+    padding: 12px 16px;
+
+    border: 2px dashed var(--color-border);
+
+    border-radius: var(--radius-small);
+
+    background: var(--color-background);
+
+    color: var(--color-text-secondary);
+
+    cursor: pointer;
+
+    transition:
+        background var(--transition-fast),
+        border-color var(--transition-fast),
+        color var(--transition-fast);
+
+}
+
+
+.file-upload-btn-stellar i {
+
+    color: var(--color-primary);
+
+}
+
+
+.file-upload-btn-stellar:hover {
+
+    border-color: var(--color-primary);
+
+    background: var(--color-surface-hover);
+
+    color: var(--color-primary);
+
+}
+
+
+/* ============================================================
+   INPUTS
+   ============================================================ */
+
+.input-field-wrapper input,
+.input-field-wrapper select,
+.input-field-wrapper textarea {
+
+    width: 100%;
+
+    box-sizing: border-box;
+
+    padding: 12px 14px;
+
+    border: 1px solid var(--color-border);
+
+    border-radius: var(--radius-small);
+
+    background: var(--color-background);
+
+    color: var(--color-text-primary);
+
+    font-size: 0.9rem;
+
+    outline: none;
+
+    transition:
+        border-color var(--transition-fast),
+        box-shadow var(--transition-fast);
+
+}
+
+
+.input-field-wrapper textarea {
+
+    min-height: 120px;
+
+    resize: vertical;
+
+}
+
+
+.input-field-wrapper input:focus,
+.input-field-wrapper select:focus,
+.input-field-wrapper textarea:focus {
+
+    border-color: var(--color-primary);
+
+    box-shadow:
+        0 0 0 3px rgba(155, 68, 242, 0.1);
+
+}
+
+
+/* ============================================================
+   CATEGORÍAS
+   ============================================================ */
+
+.categories-container {
+
+    display: grid;
+
+    grid-template-columns: repeat(2, 1fr);
+
+    gap: 10px;
+
+}
+
+
+.category-option {
+
+    position: relative;
+
+    display: flex;
+
+    align-items: center;
+
+    gap: 10px;
+
+    padding: 12px 14px;
+
+    border: 1px solid var(--color-border);
+
+    border-radius: var(--radius-small);
+
+    background: var(--color-background);
+
+    cursor: pointer;
+
+    transition:
+        border-color var(--transition-fast),
+        background var(--transition-fast),
+        box-shadow var(--transition-fast);
+
+}
+
+
+/*
+   Ocultamos el checkbox original.
+*/
+
+.category-option input {
+
+    position: absolute;
+
+    opacity: 0;
+
+    pointer-events: none;
+
+}
+
+
+/*
+   Nuestro checkbox visual.
+*/
+
+.category-check {
+
+    width: 20px;
+
+    height: 20px;
+
+    flex-shrink: 0;
+
+    border: 2px solid var(--color-border);
+
+    border-radius: 6px;
+
+    display: flex;
+
+    align-items: center;
+
+    justify-content: center;
+
+    color: white;
+
+    transition: all var(--transition-fast);
+
+}
+
+
+.category-check i {
+
+    opacity: 0;
+
+    font-size: 0.7rem;
+
+}
+
+
+/*
+   Cuando está seleccionado.
+*/
+
+.category-option:has(input:checked) {
+
+    border-color: var(--color-primary);
+
+    background: var(--color-surface-hover);
+
+    box-shadow:
+        0 4px 12px rgba(155, 68, 242, 0.08);
+
+}
+
+
+.category-option:has(input:checked) .category-check {
+
+    border-color: var(--color-primary);
+
+    background: var(--gradient-primary);
+
+}
+
+
+.category-option:has(input:checked) .category-check i {
+
+    opacity: 1;
+
+}
+
+
+.category-name {
+
+    color: var(--color-text-primary);
+
+    font-size: 0.88rem;
+
+    font-weight: 500;
+
+}
+
+
+/* ============================================================
+   ERRORES
+   ============================================================ */
+
+.stellar-error-message {
+
+    display: flex;
+
+    align-items: center;
+
+    gap: 6px;
+
+    margin-top: 3px;
+
+    color: #DC2626;
+
+    font-size: 0.8rem;
+
+}
+
+
+/* ============================================================
+   BOTONES
+   ============================================================ */
+
+.form-actions-stellar {
+
+    display: flex;
+
+    justify-content: flex-end;
+
+    gap: 12px;
+
+    margin-top: 10px;
+
+    padding-top: 20px;
+
+    border-top: 1px solid var(--color-border);
+
+}
+
+
+.btn-stellar-form {
+
+    display: inline-flex;
+
+    align-items: center;
+
+    justify-content: center;
+
+    gap: 8px;
+
+    padding: 11px 20px;
+
+    border-radius: var(--radius-small);
+
+    border: 1px solid transparent;
+
+    font-size: 0.875rem;
+
+    font-weight: 600;
+
+    text-decoration: none;
+
+    cursor: pointer;
+
+    transition: all var(--transition-fast);
+
+}
+
+
+/* Cancelar */
+
+.btn-stellar-cancel {
+
+    color: var(--color-text-secondary);
+
+    background: transparent;
+
+    border-color: var(--color-border);
+
+}
+
+
+.btn-stellar-cancel:hover {
+
+    background: var(--color-background);
+
+    color: var(--color-text-primary);
+
+}
+
+
+/* Publicar */
+
+.btn-stellar-submit {
+
+    color: white;
+
+    background: var(--gradient-primary);
+
+    border: none;
+
+    box-shadow: var(--shadow-button);
+
+}
+
+
+.btn-stellar-submit:hover {
+
+    transform: translateY(-1px);
+
+    box-shadow: var(--shadow-card-hover);
+
+}
+
+
+/* ============================================================
+   RESPONSIVE
+   ============================================================ */
+
+@media (max-width: 600px) {
+
+    .form-container-stellar {
+
+        padding: 20px 12px 40px;
+
+    }
+
+
+    .form-card-stellar {
+
+        padding: 25px 20px;
+
+    }
+
+
+    .categories-container {
+
+        grid-template-columns: 1fr;
+
+    }
+
+
+    .form-actions-stellar {
+
+        flex-direction: column-reverse;
+
+    }
+
+
+    .btn-stellar-form {
+
+        width: 100%;
+
+    }
+
+
+    .image-preview {
+
+        height: 210px;
+
+    }
+
+}
+
+
+/* =========================================
+   CATEGORÍAS - CHECKBOX
+   ========================================= */
+
+.category-grid {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: 10px;
+}
+
+.category-option {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+
+    padding: 12px 14px;
+
+    background: var(--color-background);
+    border: 1px solid var(--color-border);
+
+    border-radius: var(--radius-small);
+
+    cursor: pointer;
+
+    transition:
+        background var(--transition-fast),
+        border-color var(--transition-fast),
+        box-shadow var(--transition-fast);
+}
+
+.category-option:hover {
+    background: var(--color-surface-hover);
+    border-color: var(--color-primary);
+}
+
+.category-option input[type="checkbox"] {
+    width: 17px;
+    height: 17px;
+
+    accent-color: var(--color-primary);
+
+    cursor: pointer;
+}
+
+.category-option:has(input[type="checkbox"]:checked) {
+    background: #f5f3ff;
+    border-color: var(--color-primary);
+
+    box-shadow:
+        0 4px 12px rgba(155, 68, 242, 0.12);
+}
+
+.category-option:has(input[type="checkbox"]:checked) span {
+    color: var(--color-primary);
+    font-weight: 600;
+}
+
+/* Contenedor de la previsualización */
+.event-image-preview {
+    width: 100%;
+    height: 220px; /* Define una altura fija adecuada */
+    border-radius: var(--radius-small, 10px);
+    overflow: hidden; /* Corta cualquier exceso */
+    background-color: var(--color-background, #F7F8FC);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border: 1px dashed var(--color-border, #E5E7EB);
+    margin-bottom: 12px;
+}
+
+
+.event-image-preview img#image-preview {
+    width: 100%;
+    height: 100%;
+    object-fit: cover; 
+    object-position: center; 
+    display: none; 
+}
+
+
+.event-image-upload input[type="file"] {
+    display: none;
+}

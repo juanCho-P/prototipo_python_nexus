@@ -1,0 +1,16 @@
+# Entorno virtual (Evita subir gigabytes de librerías al servidor)
+venv/
+.venv/
+env/
+
+# Base de datos de desarrollo local (Cada desarrollador debe tener la suya)
+*.sqlite3
+
+# Archivos temporales de Python (Compilados que genera el sistema)
+__pycache__/
+*.pyc
+
+# Configuraciones de Visual Studio Code u otros editores
+.vscode/
+.idea/
+.DS_Store

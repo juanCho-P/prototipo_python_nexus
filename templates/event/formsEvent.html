@@ -1,0 +1,90 @@
+{% extends 'dashboard/base.html' %}
+{% load static %}
+
+{% block title %}
+    {% if evento %}Editar Evento - Nexus{% else %}Crear Evento - Nexus{% endif %}
+{% endblock %}
+
+{% block extra_css %}
+<link rel="stylesheet" href="{% static 'crear_evento.css' %}">
+{% endblock %}
+
+{% block content %}
+<div class="form-container-stellar">
+    <div class="form-card-stellar">
+        <h2 class="form-title-stellar">
+            {% if evento %}
+                <i class="fa-solid fa-calendar-check header-icon"></i> Editar Evento: {{ evento.titulo }}
+            {% else %}
+                <i class="fa-solid fa-calendar-plus header-icon"></i> Crear Nuevo Evento
+            {% endif %}
+        </h2>
+        
+        <form method="POST" action="" class="stellar-form" enctype="multipart/form-data">
+            {% csrf_token %}
+            
+            {% for field in form %}
+                <div class="form-group-stellar">
+                    <label class="form-label-stellar" for="{{ field.id_for_label }}">{{ field.label }}</label>
+                    
+                    {% if field.field.widget.input_type == 'file' %}
+                        <!-- Input personalizado para imágenes/archivos -->
+                        <div class="file-upload-stellar">
+                            <label for="{{ field.id_for_label }}" class="file-upload-btn-stellar">
+                                <i class="fa-solid fa-cloud-arrow-up"></i>
+                                <span id="file-label-text-{{ field.name }}">Subir imagen del evento</span>
+                            </label>
+                            {{ field }}
+                        </div>
+                    {% else %}
+                        <div class="input-field-wrapper">
+                            {{ field }}
+                        </div>
+                    {% endif %}
+                    
+                    {% if field.errors %}
+                        {% for error in field.errors %}
+                            <div class="stellar-error-message">
+                                <i class="fa-solid fa-triangle-exclamation"></i> {{ error }}
+                            </div>
+                        {% endfor %}
+                    {% endif %}
+                </div>
+            {% endfor %}
+
+            <div class="form-actions-stellar">
+                {% if evento %}
+                    <a href="{% url 'event_detail' evento.pk %}" class="btn-stellar-form btn-stellar-cancel">
+                        <i class="fa-solid fa-xmark"></i> Cancelar
+                    </a>
+                {% else %}
+                    <button type="reset" class="btn-stellar-form btn-stellar-cancel">
+                        <i class="fa-solid fa-broom"></i> Limpiar Campos
+                    </button>
+                {% endif %}
+
+                <button type="submit" class="btn-stellar-form btn-stellar-submit">
+                    {% if evento %}
+                        <i class="fa-solid fa-floppy-disk"></i> Guardar Cambios
+                    {% else %}
+                        <i class="fa-solid fa-paper-plane"></i> Publicar Evento
+                    {% endif %}
+                </button>
+            </div>
+        </form>
+    </div>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+    // Detecta la selección de archivo e imprime el nombre del archivo subido
+    document.querySelectorAll('.file-upload-stellar input[type="file"]').forEach(input => {
+        input.addEventListener('change', (e) => {
+            const fileName = e.target.files[0] ? e.target.files[0].name : "Subir imagen del evento";
+            const labelText = e.target.closest('.file-upload-stellar').querySelector('span');
+            if (labelText) labelText.textContent = fileName;
+        });
+    });
+</script>
+{% endblock %}

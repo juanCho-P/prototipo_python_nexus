@@ -1,0 +1,329 @@
+
+{% extends 'base.html' %}
+{% load static %}
+
+
+{% block extra_css %}
+<link rel="stylesheet" href="{% static 'crear_evento.css' %}">
+{% endblock %}
+
+{% block title %}
+    Crear Foro - Nexus
+{% endblock %}
+
+{% block content %}
+
+<div class="form-container-stellar">
+
+    <div class="form-card-stellar">
+
+        <div class="form-header-stellar">
+            <i class="fa-solid fa-pen-to-square header-icon"></i>
+
+            <div>
+                <h2 class="form-title-stellar">
+                    Crear Nuevo Foro
+                </h2>
+
+                <p class="form-subtitle-stellar">
+                    Comparte un tema, duda o proyecto con la comunidad de Nexus.
+                </p>
+            </div>
+        </div>
+
+
+        <form
+            method="POST"
+            action=""
+            class="stellar-form"
+            enctype="multipart/form-data"
+        >
+
+            {% csrf_token %}
+
+
+            <!-- ========================= -->
+            <!-- 1. TÍTULO DEL FORO -->
+            <!-- ========================= -->
+
+            <div class="form-group-stellar">
+
+                <label
+                    class="form-label-stellar"
+                    for="{{ form.titulo.id_for_label }}"
+                >
+                    Título del foro
+                </label>
+
+                <div class="input-field-wrapper">
+                    {{ form.titulo }}
+                </div>
+
+                {% if form.titulo.errors %}
+                    {% for error in form.titulo.errors %}
+                        <div class="stellar-error-message">
+                            <i class="fa-solid fa-triangle-exclamation"></i>
+                            {{ error }}
+                        </div>
+                    {% endfor %}
+                {% endif %}
+
+            </div>
+
+
+            <!-- ========================= -->
+            <!-- 2. IMAGEN DEL FORO -->
+            <!-- ========================= -->
+
+            <div class="form-group-stellar">
+
+                <label class="form-label-stellar">
+                    Imagen del foro (Opcional)
+                </label>
+
+                <div class="event-image-upload">
+
+                    <!-- Vista previa -->
+                    <div class="event-image-preview">
+                        <img
+                            id="image-preview"
+                            src=""
+                            alt="Vista previa"
+                        >
+
+                        <div
+                            id="image-placeholder"
+                            class="image-placeholder"
+                        >
+                            <i class="fa-solid fa-image"></i>
+                            <span>Vista previa de la portada</span>
+                        </div>
+                    </div>
+
+
+                    <!-- Botón para subir archivo -->
+                    <label
+                        for="{{ form.imagen.id_for_label }}"
+                        class="file-upload-btn-stellar"
+                    >
+
+                        <i class="fa-solid fa-cloud-arrow-up"></i>
+
+                        <span id="file-label-text">
+                            Seleccionar imagen
+                        </span>
+
+                    </label>
+
+                    {{ form.imagen }}
+
+                </div>
+
+
+                {% if form.imagen.errors %}
+                    {% for error in form.imagen.errors %}
+                        <div class="stellar-error-message">
+                            <i class="fa-solid fa-triangle-exclamation"></i>
+                            {{ error }}
+                        </div>
+                    {% endfor %}
+                {% endif %}
+
+            </div>
+
+
+            <!-- ========================= -->
+            <!-- 3. CATEGORÍAS (CHECKBOXES) -->
+            <!-- ========================= -->
+
+            <div class="form-group-stellar">
+
+                <label class="form-label-stellar">
+                    Categorías
+                </label>
+
+                <div class="category-grid">
+
+                    {% for checkbox in form.categoria %}
+
+                        <label
+                            class="category-option"
+                            for="{{ checkbox.id_for_label }}"
+                        >
+
+                            {{ checkbox.tag }}
+
+                            <span>
+                                {{ checkbox.choice_label }}
+                            </span>
+
+                        </label>
+
+                    {% endfor %}
+
+                </div>
+
+                {% if form.categoria.errors %}
+                    {% for error in form.categoria.errors %}
+                        <div class="stellar-error-message">
+                            <i class="fa-solid fa-triangle-exclamation"></i>
+                            {{ error }}
+                        </div>
+                    {% endfor %}
+                {% endif %}
+
+            </div>
+
+
+            <!-- ========================= -->
+            <!-- 4. DESCRIPCIÓN -->
+            <!-- ========================= -->
+
+            <div class="form-group-stellar">
+
+                <label
+                    class="form-label-stellar"
+                    for="{{ form.descripcion.id_for_label }}"
+                >
+                    Descripción / Contenido
+                </label>
+
+                <div class="input-field-wrapper">
+                    {{ form.descripcion }}
+                </div>
+
+                {% if form.descripcion.errors %}
+                    {% for error in form.descripcion.errors %}
+                        <div class="stellar-error-message">
+                            <i class="fa-solid fa-triangle-exclamation"></i>
+                            {{ error }}
+                        </div>
+                    {% endfor %}
+                {% endif %}
+
+            </div>
+
+
+            <!-- ========================= -->
+            <!-- ERRORES GENERALES -->
+            <!-- ========================= -->
+
+            {% if form.non_field_errors %}
+
+                <div class="form-general-errors">
+
+                    {% for error in form.non_field_errors %}
+
+                        <div class="stellar-error-message">
+
+                            <i class="fa-solid fa-triangle-exclamation"></i>
+
+                            {{ error }}
+
+                        </div>
+
+                    {% endfor %}
+
+                </div>
+
+            {% endif %}
+
+
+            <!-- ========================= -->
+            <!-- BOTONES -->
+            <!-- ========================= -->
+
+            <div class="form-actions-stellar">
+
+                <button
+                    type="reset"
+                    class="btn-stellar-form btn-stellar-cancel"
+                >
+                    <i class="fa-solid fa-broom"></i>
+                    Limpiar
+                </button>
+
+
+                <button
+                    type="submit"
+                    class="btn-stellar-form btn-stellar-submit"
+                >
+                    <i class="fa-solid fa-paper-plane"></i>
+                    Publicar Foro
+                </button>
+
+            </div>
+
+        </form>
+
+    </div>
+
+</div>
+
+{% endblock %}
+
+
+{% block extra_js %}
+
+<script>
+
+    const fileInput = document.getElementById(
+        "{{ form.imagen.id_for_label }}"
+    );
+
+    const imagePreview = document.getElementById(
+        "image-preview"
+    );
+
+    const imagePlaceholder = document.getElementById(
+        "image-placeholder"
+    );
+
+    const fileLabel = document.getElementById(
+        "file-label-text"
+    );
+
+
+    if (fileInput) {
+
+        fileInput.addEventListener("change", function () {
+
+            const file = this.files[0];
+
+            if (file) {
+
+                fileLabel.textContent = file.name;
+
+                const reader = new FileReader();
+
+                reader.onload = function (event) {
+
+                    imagePreview.src = event.target.result;
+
+                    imagePreview.style.display = "block";
+
+                    imagePlaceholder.style.display = "none";
+
+                };
+
+                reader.readAsDataURL(file);
+
+            } else {
+
+                fileLabel.textContent = "Seleccionar imagen";
+
+                imagePreview.src = "";
+
+                imagePreview.style.display = "none";
+
+                imagePlaceholder.style.display = "flex";
+
+            }
+
+        });
+
+    }
+
+</script>
+
+{% endblock %}

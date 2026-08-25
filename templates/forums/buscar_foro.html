@@ -1,0 +1,143 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}
+    Explorar Foros - Nexus
+{% endblock %}
+
+{% block extra_css %}
+<link rel="stylesheet" href="{% static 'buscar_foro.css' %}">
+{% endblock %}
+
+{% block content %}
+<div class="forums-explorer-container">
+
+    <!-- Buscador y Filtro por Categoría / Orden -->
+    <div class="search-header-stellar">
+        <h1 class="search-title">Comunidades y Foros</h1>
+        <p class="search-subtitle">Explora los temas de conversación activos o busca uno en específico.</p>
+        
+        <form method="GET" action="" class="search-bar-form">
+            <div class="search-inputs-group">
+                <!-- Select de Categorías -->
+                <select name="categoria" class="category-select" onchange="this.form.submit()">
+                    <option value="">Todas las categorías</option>
+                    {% for cat in categorias %}
+                        <option value="{{ cat.id }}" {% if request.GET.categoria == cat.id|stringformat:"s" %}selected{% endif %}>
+                            {{ cat.nombre }}
+                        </option>
+                    {% endfor %}
+                </select>
+
+                <!-- Select de Ordenamiento -->
+                <select name="orden" class="category-select" onchange="this.form.submit()">
+                    <option value="recientes" {% if orden_actual == 'recientes' or not orden_actual %}selected{% endif %}>Más recientes</option>
+                    <option value="populares" {% if orden_actual == 'populares' %}selected{% endif %}>Más comentados</option>
+                </select>
+
+                <!-- Input de Búsqueda -->
+                <div class="search-input-wrapper">
+                    <i class="fa-solid fa-magnifying-glass search-icon"></i>
+                    <input 
+                        type="text" 
+                        name="q" 
+                        placeholder="Buscar por título o contenido..." 
+                        value="{{ request.GET.q|default:'' }}"
+                        class="search-input"
+                    >
+                    <button type="submit" class="search-btn">Buscar</button>
+                </div>
+            </div>
+        </form>
+    </div>
+
+    <!-- Grilla de Tarjetas -->
+    <div class="forums-grid">
+        {% for foro in page_obj %}
+            <div class="forum-card-overlay">
+                
+                <!-- Imagen de Portada -->
+                <div class="card-image-wrapper">
+                    {% if foro.imagen %}
+                        <img src="{{ foro.imagen.url }}" alt="{{ foro.titulo }}" class="card-bg-image">
+                    {% else %}
+                        <img src="{% static 'images/default_forum.jpg' %}" alt="Imagen por defecto" class="card-bg-image">
+                    {% endif %}
+                    <div class="card-gradient-overlay"></div>
+                </div>
+
+                <!-- Botón de Edición (Creador del Foro) -->
+                {% if request.user == foro.id_creador %}
+                    <a href="{% url 'editar_foro' foro.id %}" class="edit-forum-btn" title="Editar Foro">
+                        <i class="fa-solid fa-pen-to-square"></i>
+                    </a>
+                {% endif %}
+
+                <!-- Contenido Superpuesto -->
+                <div class="card-overlay-content">
+                    
+                    <!-- Categorías Badge -->
+                    <div class="forum-categories-badges">
+                        {% if foro.categoria.all %}
+                            {% for cat in foro.categoria.all %}
+                                <span class="category-badge">{{ cat.nombre }}</span>
+                            {% endfor %}
+                        {% endif %}
+                    </div>
+
+                    <h3 class="forum-card-title">
+                        <a href="{% url 'foro_detalle' foro.id %}">{{ foro.titulo }}</a>
+                    </h3>
+
+                    <p class="forum-card-description">
+                        {{ foro.descripcion }}
+                    </p>
+
+                    <div class="card-footer-stats">
+                        <div class="stats-group">
+                           
+                            <span class="stat-item" title="Comentarios activos">
+                                <i class="fa-regular fa-comment-dots"></i> 
+                                {{ foro.total_comentarios|default:"0" }}
+                            </span>
+                        </div>
+
+                        <a href="{% url 'foro_detalle' foro.id %}" class="btn-join-forum">
+                            Ver Foro <i class="fa-solid fa-arrow-right"></i>
+                        </a>
+                    </div>
+
+                </div>
+
+            </div>
+        {% empty %}
+            <div class="no-results-stellar">
+                <i class="fa-solid fa-comments-question"></i>
+                <p>No se encontraron foros que coincidan con la búsqueda.</p>
+            </div>
+        {% endfor %}
+    </div>
+
+    <!-- Paginación -->
+    {% if page_obj.has_other_pages %}
+        <div class="pagination-stellar">
+            {% if page_obj.has_previous %}
+                <a href="?page={{ page_obj.previous_page_number }}{% if request.GET.q %}&q={{ request.GET.q }}{% endif %}{% if request.GET.categoria %}&categoria={{ request.GET.categoria }}{% endif %}{% if request.GET.orden %}&orden={{ request.GET.orden }}{% endif %}" class="page-link">
+                    <i class="fa-solid fa-chevron-left"></i> Anterior
+                </a>
+            {% endif %}
+
+            <span class="page-current">
+                Página {{ page_obj.number }} de {{ page_obj.paginator.num_pages }}
+            </span>
+
+            {% if page_obj.has_next %}
+                <a href="?page={{ page_obj.next_page_number }}{% if request.GET.q %}&q={{ request.GET.q }}{% endif %}{% if request.GET.categoria %}&categoria={{ request.GET.categoria }}{% endif %}{% if request.GET.orden %}&orden={{ request.GET.orden }}{% endif %}" class="page-link">
+                    Siguiente <i class="fa-solid fa-chevron-right"></i>
+                </a>
+            {% endif %}
+        </div>
+    {% endif %}
+
+</div>
+{% endblock %}

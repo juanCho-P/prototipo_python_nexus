@@ -1,0 +1,322 @@
+{% load static %}
+
+<!DOCTYPE html>
+<html lang="es">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <title>
+        Nexus | {% block title %}Dashboard{% endblock %}
+    </title>
+
+    <!-- Font Awesome -->
+    <link
+        rel="stylesheet"
+        href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css"
+    >
+
+    <!-- CSS principal del Dashboard -->
+    <link rel="stylesheet" href="{% static 'base.css' %}">
+
+    {% block extra_css %}{% endblock %}
+</head>
+
+<body>
+
+    <div class="app">
+
+        <!-- =========================
+             SIDEBAR
+        ========================== -->
+
+        <aside class="sidebar" id="sidebar">
+
+            <div class="sidebar-header">
+
+                <h2 class="logo">
+                    NEXUS
+                </h2>
+
+                <button
+                    type="button"
+                    class="sidebar-toggle"
+                    id="sidebarToggle"
+                    aria-label="Contraer menú"
+                >
+                    <i class="fa-solid fa-bars"></i>
+                </button>
+
+            </div>
+
+
+            <!-- =========================
+                 NAVEGACIÓN
+            ========================== -->
+
+            <nav class="sidebar-nav">
+
+                <ul>
+
+                    <li>
+                        <a href="{% url 'dashboard' %}"
+                           class="sidebar-link">
+
+                            <i class="fa-solid fa-chart-pie"></i>
+
+                            <span>Dashboard</span>
+
+                        </a>
+                    </li>
+
+
+                    <li>
+                        <a href="{% url 'event_list' %}"
+                           class="sidebar-link">
+
+                            <i class="fa-solid fa-compass"></i>
+
+                            <span>Descubrir Eventos</span>
+
+                        </a>
+                    </li>
+
+
+                    <li>
+                        <a href="{% url 'crear_evento' %}"
+                           class="sidebar-link">
+
+                            <i class="fa-solid fa-calendar-plus"></i>
+
+                            <span>Crear Evento</span>
+
+                        </a>
+                    </li>
+
+
+                    <li>
+                        <a href="{% url 'buscar_foro' %}"
+                           class="sidebar-link">
+
+                            <i class="fa-solid fa-comments"></i>
+
+                            <span>Descubrir Foros</span>
+
+                        </a>
+                    </li>
+
+
+                    <li>
+                        <a href="{% url 'crear_foro' %}"
+                           class="sidebar-link">
+
+                            <i class="fa-solid fa-comment-medical"></i>
+
+                            <span>Crear Foro</span>
+
+                        </a>
+                    </li>
+
+
+                    <li>
+                        <a href="{% url 'mis_foros_guardados' %}"
+                           class="sidebar-link">
+
+                            <i class="fa-solid fa-folder"></i>
+
+                            <span>Mis Foros Guardados</span>
+
+                        </a>
+                    </li>
+
+
+                     <li>
+                        <a href="{% url 'mis_eventos' %}"
+                           class="sidebar-link">
+
+                            <i class="fa-solid fa-folder"></i>
+
+                            <span>Mis Eventos</span>
+
+                        </a>
+                    </li>
+
+                </ul>
+
+            </nav>
+
+
+            <!-- =========================
+                 CERRAR SESIÓN
+            ========================== -->
+
+            <div class="sidebar-footer">
+
+                <form
+                    action="{% url 'logout' %}"
+                    method="post"
+                >
+
+                    {% csrf_token %}
+
+                    <button
+                        type="submit"
+                        class="sidebar-link logout-button"
+                    >
+
+                        <i class="fa-solid fa-arrow-right-from-bracket"></i>
+
+                        <span>Cerrar sesión</span>
+
+                    </button>
+
+                </form>
+
+            </div>
+
+        </aside>
+
+
+        <!-- =========================
+             CONTENIDO PRINCIPAL
+        ========================== -->
+
+        <main class="main">
+
+            <!-- =========================
+                 TOPBAR
+            ========================== -->
+
+            <header class="topbar">
+
+                <div class="topbar-left">
+
+                    <button
+                        type="button"
+                        class="mobile-menu"
+                        id="mobileMenu"
+                    >
+                        <i class="fa-solid fa-bars"></i>
+                    </button>
+
+                </div>
+
+
+                <div class="topbar-right">
+
+                    <!-- Notificaciones -->
+
+                    <button
+                        type="button"
+                        class="topbar-icon"
+                        title="Notificaciones"
+                    >
+
+                        <i class="fa-regular fa-bell"></i>
+
+                    </button>
+
+
+                    <!-- Perfil -->
+
+                    <a
+                        href="{% url 'perfil' %}"
+                        class="profile-button"
+                    >
+
+                        {% if request.user.avatar %}
+                            <img
+                                src="{{ request.user.avatar.url }}"
+                                alt="Avatar"
+                                class="profile-avatar"
+                            >
+                        {% else %}
+                            <div class="profile-avatar default-avatar">
+                                <i class="fa-solid fa-user"></i>
+                            </div>
+                        {% endif %}
+
+                        <span class="profile-name">
+                            {{ request.user.username }}
+                        </span>
+
+                    </a>
+
+                </div>
+
+            </header>
+
+
+            <!-- =========================
+                 CONTENIDO VARIABLE
+            ========================== -->
+
+            <section class="content">
+
+                {% if messages %}
+
+                    <div class="messages">
+
+                        {% for message in messages %}
+
+                            <div class="message {{ message.tags }}">
+                                {{ message }}
+                            </div>
+
+                        {% endfor %}
+
+                    </div>
+
+                {% endif %}
+
+
+                {% block content %}
+
+                {% endblock %}
+
+            </section>
+
+        </main>
+
+    </div>
+
+
+    <!-- JavaScript del Dashboard -->
+
+    <script>
+
+        const sidebar = document.getElementById("sidebar");
+        const sidebarToggle = document.getElementById("sidebarToggle");
+        const mobileMenu = document.getElementById("mobileMenu");
+
+
+        /*
+         * Contraer / expandir sidebar
+         */
+
+        sidebarToggle.addEventListener("click", () => {
+
+            sidebar.classList.toggle("collapsed");
+
+        });
+
+
+        /*
+         * Menú en dispositivos pequeños
+         */
+
+        mobileMenu.addEventListener("click", () => {
+
+            sidebar.classList.toggle("mobile-open");
+
+        });
+
+    </script>
+
+
+    {% block extra_js %}{% endblock %}
+
+</body>
+
+</html>
