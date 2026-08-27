@@ -1,0 +1,150 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}{{ evento.titulo }} - Nexus{% endblock %}
+
+{% block extra_css %}
+<link rel="stylesheet" href="{% static 'evento_detalle.css' %}">
+{% endblock %}
+
+{% block content %}
+<div class="detail-page-wrapper">
+    
+    <div class="detail-card">
+        
+        <!-- HEADER -->
+        <header class="detail-header">
+            <div class="detail-title-group">
+                <div class="detail-icon-box">
+                    <i class="fa-solid fa-calendar-day"></i>
+                </div>
+                <div>
+                    <div class="title-status-wrapper">
+                        <h1 class="detail-title">{{ evento.titulo }}</h1>
+                        
+                        <!-- BADGE DE ESTADO EVALUADO CORRECTAMENTE -->
+                        {% if evento.estado == 'CANCELADO' or evento.estado == 'cancelado' %}
+                            <span class="status-badge status-cancelled">
+                                <i class="fa-solid fa-circle-xmark"></i> Cancelado
+                            </span>
+                        {% elif evento.estado == 'FINALIZADO' or evento.estado == 'finalizado' or evento.f_fin < now %}
+                            <span class="status-badge status-finished">
+                                <i class="fa-solid fa-clock-rotate-left"></i> Finalizado
+                            </span>
+                        {% else %}
+                            <span class="status-badge status-active">
+                                <i class="fa-solid fa-circle-check"></i> Activo
+                            </span>
+                        {% endif %}
+                    </div>
+
+                    <p class="detail-subtitle">
+                        Organizado por <span class="author-tag">@{{ evento.id_creador.username }}</span>
+                    </p>
+                </div>
+            </div>
+
+            <!-- ACCIONES DEL CREADOR -->
+            {% if es_creador and evento.estado != 'CANCELADO' and evento.estado != 'cancelado' and evento.f_fin >= now %}
+                <div class="creator-actions">
+                    <a href="{% url 'editar_evento' evento.pk %}" class="btn-detail btn-edit">
+                        <i class="fa-solid fa-pen-to-square"></i> Editar
+                    </a>
+
+                    <form method="POST" action="{% url 'cancelar_evento' evento.pk %}" class="inline-form" onsubmit="return confirm('¿Estás seguro de cancelar este evento?');">
+                        {% csrf_token %}
+                        <button type="submit" class="btn-detail btn-danger-soft">
+                            <i class="fa-solid fa-ban"></i> Cancelar Evento
+                        </button>
+                    </form>
+                </div>
+            {% endif %}
+        </header>
+
+        <!-- PORTADA CON OVERLAY DE ESTADO -->
+        <div class="detail-media-container">
+            {% if evento.imagen %}
+                <img src="{{ evento.imagen.url }}" alt="{{ evento.titulo }}" class="detail-banner-img {% if evento.estado == 'CANCELADO' or evento.estado == 'cancelado' or evento.f_fin < now %}grayscale{% endif %}">
+            {% else %}
+                <div class="detail-media-placeholder">
+                    <i class="fa-solid fa-image"></i>
+                    <span>Sin imagen de portada</span>
+                </div>
+            {% endif %}
+
+            {% if evento.estado == 'CANCELADO' or evento.estado == 'cancelado' %}
+                <div class="media-overlay-status overlay-cancelled">EVENTO CANCELADO</div>
+            {% elif evento.f_fin < now or evento.estado == 'FINALIZADO' or evento.estado == 'finalizado' %}
+                <div class="media-overlay-status overlay-finished">EVENTO FINALIZADO</div>
+            {% endif %}
+        </div>
+
+        <!-- GRID DE INFORMACIÓN -->
+        <div class="detail-grid">
+            <div class="detail-field-box">
+                <span class="field-label"><i class="fa-solid fa-clock"></i> Fecha de Inicio</span>
+                <div class="field-content">{{ evento.f_inicio|date:"d/m/Y - h:i A" }}</div>
+            </div>
+
+            <div class="detail-field-box">
+                <span class="field-label"><i class="fa-solid fa-flag-checkered"></i> Fecha de Finalización</span>
+                <div class="field-content">{{ evento.f_fin|date:"d/m/Y - h:i A" }}</div>
+            </div>
+        </div>
+
+        <div class="detail-field-box full-width">
+            <span class="field-label"><i class="fa-solid fa-location-dot"></i> Ubicación</span>
+            <div class="field-content">{{ evento.ubicacion }}</div>
+        </div>
+
+        <div class="detail-field-box full-width">
+            <span class="field-label"><i class="fa-solid fa-align-left"></i> Descripción del Evento</span>
+            <div class="field-content text-block">{{ evento.descripcion }}</div>
+        </div>
+
+        <div class="detail-field-box full-width">
+            <span class="field-label"><i class="fa-solid fa-tags"></i> Categorías</span>
+            <div class="tags-wrapper">
+                {% for cat in evento.categoria.all %}
+                    <span class="category-chip">{{ cat.nombre }}</span>
+                {% empty %}
+                    <span class="no-tags">Sin categorías asignadas</span>
+                {% endfor %}
+            </div>
+        </div>
+
+        <!-- FOOTER DE ACCIONES -->
+        <footer class="detail-footer">
+            {% if not es_creador %}
+                <a href="{% url 'reportar_evento' evento.pk %}" class="btn-report">
+                    <i class="fa-solid fa-triangle-exclamation"></i> Reportar Evento
+                </a>
+
+                {% if evento.estado != 'CANCELADO' and evento.estado != 'cancelado' and evento.f_fin >= now %}
+                    <form method="POST" action="{% url 'unirse_evento' evento.pk %}" class="action-form">
+                        {% csrf_token %}
+                        {% if ya_asiste %}
+                            <button type="submit" class="btn-detail btn-leave">
+                                <i class="fa-solid fa-user-minus"></i> Cancelar Asistencia
+                            </button>
+                        {% else %}
+                            <button type="submit" class="btn-detail btn-join">
+                                <i class="fa-solid fa-user-plus"></i> Unirme al Evento ({{ total_asistentes }} asistiendo)
+                            </button>
+                        {% endif %}
+                    </form>
+                {% else %}
+                    <span class="text-disabled-action">
+                        <i class="fa-solid fa-lock"></i> Las inscripciones están cerradas
+                    </span>
+                {% endif %}
+            {% else %}
+                <div class="attendees-counter">
+                    <i class="fa-solid fa-users"></i> Total de asistentes confirmados: <strong>{{ total_asistentes }}</strong>
+                </div>
+            {% endif %}
+        </footer>
+
+    </div>
+</div>
+{% endblock %}

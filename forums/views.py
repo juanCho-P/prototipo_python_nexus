@@ -3,6 +3,7 @@ from django.contrib.auth.decorators import login_required
 from django.db.models import Count
 from django.shortcuts import render, redirect, get_object_or_404
 from categorias.models import Categoria
+from notification.models import Notificacion
 from .forms import ForoForm
 from django.core.paginator import Paginator
 from django.db.models import Q
@@ -91,6 +92,108 @@ def buscar_foro(request):
 
 @login_required
 def detalle_foro(request, foro_id):
+    foro = get_object_or_404(Foro, id=foro_id)
+
+    if foro.estado != 'PUBLICADO' and foro.id_creador != request.user:
+        messages.error(request, 'Este foro no está disponible.')
+        return redirect('buscar_foro')
+
+    if request.method == 'POST':
+        
+        if foro.estado == 'ELIMINADO':
+            messages.error(request, 'Este foro está desactivado y no acepta nuevas respuestas.')
+            return redirect('foro_detalle', foro_id=foro.id)
+
+        # Validar correo verificado
+        if hasattr(request.user, 'email_verificado') and not request.user.email_verificado:
+            messages.error(request, 'Debes verificar tu correo electrónico para comentar.')
+            return redirect('foro_detalle', foro_id=foro.id)
+
+        contenido = request.POST.get('contenido', '').strip()
+        imagen_adjunta = request.FILES.get('imagen')    
+
+        if not contenido and not imagen_adjunta:
+            messages.error(request, 'El comentario no puede estar vacío.')
+            return redirect('foro_detalle', foro_id=foro.id)
+
+        comentario_padre_id = request.POST.get('comentario_padre')
+        comentario_padre = None
+
+        if comentario_padre_id:
+            comentario_padre = get_object_or_404(
+                Comentario,
+                id=comentario_padre_id,
+                id_foro=foro
+            )
+
+        # Guardar comentario
+        nuevo_comentario = Comentario.objects.create(
+            respuesta=contenido,
+            imagen=imagen_adjunta,
+            id_foro=foro,
+            id_usuario=request.user,
+            comentario_padre=comentario_padre
+        )
+
+     
+        usuarios_a_notificar = set()
+
+        
+        usuarios_guardados = ForoGuardado.objects.filter(
+            foro=foro
+        ).exclude(
+            usuario=request.user
+        ).values_list('usuario_id', flat=True)
+
+        usuarios_a_notificar.update(usuarios_guardados)
+
+    
+        if comentario_padre and comentario_padre.id_usuario != request.user:
+            usuarios_a_notificar.add(comentario_padre.id_usuario.id)
+
+        
+        notificaciones = [
+            Notificacion(
+                usuario_id=usr_id,
+                tipo='NUEVO_COMENTARIO',
+                mensaje=f"Nuevo comentario en el foro '{foro.titulo}'."
+            )
+            for usr_id in usuarios_a_notificar
+        ]
+        
+        if notificaciones:
+            Notificacion.objects.bulk_create(notificaciones)
+
+        messages.success(request, 'Comentario publicado correctamente.')
+        return redirect('foro_detalle', foro_id=foro.id)
+
+
+    publicaciones = (
+        Comentario.objects
+        .select_related('id_usuario', 'comentario_padre')
+        .prefetch_related('respuestas__id_usuario')
+        .filter(
+            id_foro=foro,
+            comentario_padre__isnull=True,
+            activo=True
+        )
+        .order_by('-created_at') 
+    )
+
+    es_guardado = ForoGuardado.objects.filter(
+        usuario=request.user, 
+        foro=foro
+    ).exists()
+
+    return render(
+        request,
+        'forums/foro_detalle.html',
+        {
+            'foro': foro,
+            'publicaciones': publicaciones,
+            'es_guardado': es_guardado,
+        }
+    )
     foro = get_object_or_404(Foro, id=foro_id)
 
 
@@ -346,5 +449,6 @@ def mis_foros_guardados(request):
     return render(request, 'forums/mis_foros_guardados.html', {
         'foros_guardados': foros_guardados
     })
+
     guardados = ForoGuardado.objects.filter(usuario=request.user).select_related('foro').order_by('-created_at')
     return render(request, 'forums/foro_guardado.html', {'guardados': guardados})

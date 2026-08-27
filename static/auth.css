@@ -331,7 +331,7 @@ INPUT DE ARCHIVO / AVATAR
 }
 
 .file-upload-input {
-    display: none; /* Oculta el input por defecto */
+    display: none; 
 }
 
 .file-upload-btn {
@@ -435,7 +435,7 @@ INPUT DE ARCHIVO / AVATAR
     color: #198754;
 }
 
-/* Mensaje de coincidencia */
+
 .match-msg {
     font-size: 0.75rem;
     display: block;
@@ -451,7 +451,7 @@ INPUT DE ARCHIVO / AVATAR
     color: #198754;
 }
 
-/* Ajustes para el contenedor principal de los formularios */
+/*  contenedor principal de los formularios */
 .form-container form {
     background-color: #fff;
     display: flex;
@@ -461,11 +461,11 @@ INPUT DE ARCHIVO / AVATAR
     padding: 20px 40px;
     height: 100%;
     text-align: center;
-    overflow-y: auto; /* Permite scroll vertical si el contenido es muy alto */
+    overflow-y: auto; 
     box-sizing: border-box;
 }
 
-/* Scroll personalización suave */
+
 .form-container form::-webkit-scrollbar {
     width: 5px;
 }
@@ -474,7 +474,6 @@ INPUT DE ARCHIVO / AVATAR
     border-radius: 10px;
 }
 
-/* Estilos de la caja informativa */
 .password-requirements {
     font-size: 0.75rem;
     text-align: left;
@@ -523,7 +522,7 @@ INPUT DE ARCHIVO / AVATAR
 .match-msg.success { color: #198754; }
 
 
-/* Contenedor relativo para posicionar el icono */
+
 .password-field-wrapper {
     position: relative;
     width: 100%;
@@ -533,10 +532,10 @@ INPUT DE ARCHIVO / AVATAR
 
 .password-field-wrapper input {
     width: 100%;
-    padding-right: 40px; /* Espacio para que el texto no tape el icono */
+    padding-right: 40px; 
 }
 
-/* Estilos del icono de ojo */
+
 .toggle-password {
     position: absolute;
     right: 12px;

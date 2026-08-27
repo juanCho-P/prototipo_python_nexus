@@ -11,6 +11,33 @@
 
 {% block content %}
 
+<!-- ========================================================= -->
+<!-- CONTENEDOR DE ALERTAS / TOASTS FLOTANTES -->
+<!-- ========================================================= -->
+{% if messages %}
+<div class="stellar-toast-container">
+    {% for message in messages %}
+        <div class="stellar-toast stellar-toast-{{ message.tags }}">
+            <div class="toast-icon">
+                {% if message.tags == 'success' %}
+                    <i class="fa-solid fa-circle-check"></i>
+                {% elif message.tags == 'error' %}
+                    <i class="fa-solid fa-circle-exclamation"></i>
+                {% else %}
+                    <i class="fa-solid fa-circle-info"></i>
+                {% endif %}
+            </div>
+            <div class="toast-content">
+                <strong>{% if message.tags == 'error' %}¡Atención!{% else %}¡Notificación!{% endif %}</strong>
+                <p>{{ message }}</p>
+            </div>
+            <button type="button" class="toast-close" onclick="this.parentElement.remove();">&times;</button>
+        </div>
+    {% endfor %}
+</div>
+{% endif %}
+
+
 <div class="form-container-stellar">
 
     <div class="form-card-stellar">
@@ -294,7 +321,7 @@
 
 
             <!-- ========================= -->
-            <!-- ERRORES GENERALES -->
+            <!-- ERRORES GENERALES DEL FORMULARIO -->
             <!-- ========================= -->
 
             {% if form.non_field_errors %}
@@ -319,7 +346,7 @@
 
 
             <!-- ========================= -->
-            <!-- BOTONES -->
+            <!-- BOTONES DE ACCIÓN -->
             <!-- ========================= -->
 
             <div class="form-actions-stellar">
@@ -356,6 +383,9 @@
 
 <script>
 
+    // -------------------------------------------------------------
+    // Vista previa de imagen seleccionada
+    // -------------------------------------------------------------
     const fileInput = document.getElementById(
         "{{ form.imagen.id_for_label }}"
     );
@@ -402,6 +432,19 @@
         });
 
     }
+
+    // -------------------------------------------------------------
+    // Ocultar notificaciones flotantes automáticamente a los 5s
+    // -------------------------------------------------------------
+    setTimeout(() => {
+        const toasts = document.querySelectorAll('.stellar-toast');
+        toasts.forEach(toast => {
+            toast.style.transition = 'opacity 0.5s ease, transform 0.5s ease';
+            toast.style.opacity = '0';
+            toast.style.transform = 'translateX(100%)';
+            setTimeout(() => toast.remove(), 500);
+        });
+    }, 5000);
 
 </script>
 

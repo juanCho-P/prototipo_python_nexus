@@ -1,308 +1,224 @@
 {% extends 'base.html' %}
 
-{% block title %}
-Dashboard
+{% block title %}Dashboard{% endblock %}
+
+{% block extra_css %}
+
+<style>
+    .alert-strike-card {
+    display: flex;
+    align-items: center;
+    gap: 15px;
+    padding: 16px 20px;
+    border-radius: 8px;
+    margin-bottom: 24px;
+}
+
+.alert-strike-card.warning {
+    background-color: #fff3cd;
+    border: 1px solid #ffe69c;
+    color: #664d03;
+}
+
+.alert-strike-card.danger {
+    background-color: #f8d7da;
+    border: 1px solid #f5c2c7;
+    color: #842029;
+}
+
+.alert-icon {
+    font-size: 1.5rem;
+}
+</style>
 {% endblock %}
 
-
 {% block content %}
-
 <div class="dashboard">
 
     <!-- =========================
          ENCABEZADO
     ========================== -->
-
     <div class="dashboard-header">
-
         <div>
-
-            <h1>
-                Bienvenido, {{ request.user.nombres }}
-                👋
-            </h1>
-
-            <p>
-                Aquí tienes un resumen de tu actividad en Nexus.
-            </p>
-
+            <h1>Bienvenido, {{ request.user.nombres }} 👋</h1>
+            <p>Aquí tienes un resumen de tu actividad en Nexus.</p>
         </div>
-
     </div>
 
+    <!-- =========================
+         ALERTA DE STRIKES Y ESTADO DE CUENTA
+    ========================== -->
+    {% if strikes_count > 0 %}
+        <div class="alert-strike-card {% if strikes_count >= 3 %}danger{% else %}warning{% endif %}">
+            <div class="alert-icon">
+                <i class="fa-solid fa-triangle-exclamation"></i>
+            </div>
+            <div class="alert-content">
+                <h3>Estado de la cuenta: {{ strikes_count }} {% if strikes_count == 1 %}strike{% else %}strikes{% endif %}</h3>
+                <p>
+                    {% if strikes_count >= 3 %}
+                        Has alcanzado el límite de advertencias. Tu cuenta está bajo revisión de moderación.
+                    {% else %}
+                        Recuerda seguir las normas de la comunidad para evitar la suspensión de tu cuenta.
+                    {% endif %}
+                </p>
+            </div>
+        </div>
+    {% endif %}
 
     <!-- =========================
-         ESTADÍSTICAS
+         ESTADÍSTICAS GENERALES
     ========================== -->
-
     <div class="stats-grid">
 
-
         <!-- EVENTOS -->
-
         <div class="stat-card">
-
             <div class="stat-icon purple">
                 <i class="fa-solid fa-calendar-days"></i>
             </div>
-
             <div class="stat-info">
-
-                <span class="stat-number">
-                    {{ total_eventos }}
-                </span>
-
-                <span class="stat-label">
-                    Eventos creados
-                </span>
-
+                <span class="stat-number">{{ total_eventos }}</span>
+                <span class="stat-label">Eventos creados</span>
             </div>
-
         </div>
 
-
         <!-- FOROS -->
-
         <div class="stat-card">
-
             <div class="stat-icon blue">
                 <i class="fa-solid fa-comments"></i>
             </div>
-
             <div class="stat-info">
-
-                <span class="stat-number">
-                    {{ total_foros }}
-                </span>
-
-                <span class="stat-label">
-                    Foros creados
-                </span>
-
+                <span class="stat-number">{{ total_foros }}</span>
+                <span class="stat-label">Foros creados</span>
             </div>
-
         </div>
 
-
-        <!-- ASISTENTES -->
-
+        <!-- ASISTENTES TOTALES -->
         <div class="stat-card">
-
             <div class="stat-icon cyan">
                 <i class="fa-solid fa-users"></i>
             </div>
-
             <div class="stat-info">
-
-                <span class="stat-number">
-                    {{ total_asistentes }}
-                </span>
-
-                <span class="stat-label">
-                    Asistentes a tus eventos
-                </span>
-
+                <span class="stat-number">{{ total_asistentes }}</span>
+                <span class="stat-label">Asistentes acumulados</span>
             </div>
+        </div>
 
+        <!-- EVENTO MÁS POPULAR -->
+        <div class="stat-card">
+            <div class="stat-icon green">
+                <i class="fa-solid fa-fire"></i>
+            </div>
+            <div class="stat-info">
+                <span class="stat-number">
+                    {% if evento_top %}{{ evento_top.asistentes.count }}{% else %}0{% endif %}
+                </span>
+                <span class="stat-label">
+                    {% if evento_top %}Top: {{ evento_top.titulo|truncatechars:15 }}{% else %}Sin eventos tops{% endif %}
+                </span>
+            </div>
         </div>
 
     </div>
 
-
     <!-- =========================
-         MIS EVENTOS
+         MIS EVENTOS Y MÉTRICAS
     ========================== -->
-
     <section class="dashboard-section">
-
         <div class="section-header">
-
             <div>
-
-                <h2>
-                    Mis eventos
-                </h2>
-
-                <p>
-                    Eventos que has creado.
-                </p>
-
+                <h2>Mis eventos</h2>
+                <p>Monitorea la asistencia y el estado de tus eventos.</p>
             </div>
-
-            <a
-                href="{% url 'crear_evento' %}"
-                class="primary-button"
-            >
-                <i class="fa-solid fa-plus"></i>
-                Crear evento
+            <a href="{% url 'crear_evento' %}" class="primary-button">
+                <i class="fa-solid fa-plus"></i> Crear evento
             </a>
-
         </div>
 
-
         {% if eventos %}
-
             <div class="event-table">
-
                 <div class="table-header">
-
                     <span>Título</span>
                     <span>Fecha</span>
                     <span>Ubicación</span>
+                    <span>Estado</span>
                     <span>Asistentes</span>
-
+                    <span>Acciones</span>
                 </div>
 
-
                 {% for evento in eventos %}
-
                     <div class="table-row">
-
                         <span class="event-title">
-                            {{ evento.titulo }}
+                            <a href="{% url 'evento_detalle' evento.pk %}">{{ evento.titulo }}</a>
                         </span>
-
+                        <span>{{ evento.f_inicio|date:"d/m/Y H:i" }}</span>
+                        <span>{{ evento.ubicacion }}</span>
                         <span>
-                            {{ evento.fecha_hora_inicio|date:"d/m/Y H:i" }}
+                            <span class="status-badge status-{{ evento.estado|lower }}">
+                                {{ evento.estado }}
+                            </span>
                         </span>
-
                         <span>
-                            {{ evento.ubicacion }}
+                            <i class="fa-solid fa-user-group"></i> {{ evento.asistentes.count }}
                         </span>
-
                         <span>
-                            {{ evento.asistentes.count }}
+                            <a href="{% url 'evento_detalle' evento.pk %}" class="btn-icon" title="Ver detalle">
+                                <i class="fa-solid fa-eye"></i>
+                            </a>
                         </span>
-
                     </div>
-
                 {% endfor %}
-
             </div>
-
         {% else %}
-
             <div class="empty-state">
-
                 <i class="fa-regular fa-calendar"></i>
-
-                <h3>
-                    Todavía no tienes eventos
-                </h3>
-
-                <p>
-                    Crea tu primer evento y comienza a conectar
-                    con otras personas.
-                </p>
-
-                <a
-                    href="{% url 'crear_evento' %}"
-                    class="primary-button"
-                >
-                    Crear mi primer evento
-                </a>
-
+                <h3>Todavía no tienes eventos</h3>
+                <p>Crea tu primer evento y comienza a conectar con otras personas.</p>
+                <a href="{% url 'crear_evento' %}" class="primary-button">Crear mi primer evento</a>
             </div>
-
         {% endif %}
-
     </section>
-
 
     <!-- =========================
          MIS FOROS
     ========================== -->
-
     <section class="dashboard-section">
-
         <div class="section-header">
-
             <div>
-
-                <h2>
-                    Mis foros
-                </h2>
-
-                <p>
-                    Comunidades que has creado.
-                </p>
-
+                <h2>Mis foros</h2>
+                <p>Comunidades que has creado.</p>
             </div>
-
-            <a
-                href="#"
-                class="primary-button"
-            >
-                <i class="fa-solid fa-plus"></i>
-                Crear foro
+            <a href="{% url 'crear_foro' %}" class="primary-button">
+                <i class="fa-solid fa-plus"></i> Crear foro
             </a>
-
         </div>
 
-
         {% if foros %}
-
             <div class="forum-grid">
-
                 {% for foro in foros %}
-
                     <article class="forum-card">
-
                         <div class="forum-card-icon">
-
                             <i class="fa-solid fa-comments"></i>
-
                         </div>
-
-                        <h3>
-                            {{ foro.titulo }}
-                        </h3>
-
-                        <p>
-                            {{ foro.descripcion|truncatechars:100 }}
-                        </p>
-
-                        <a
-                            href="#"
-                            class="card-link"
-                        >
-                            Ver foro
-                            <i class="fa-solid fa-arrow-right"></i>
+                        <h3>{{ foro.titulo }}</h3>
+                        <p>{{ foro.descripcion|truncatechars:100 }}</p>
+                        <a href="{% url 'foro_detalle' foro.id %}" class="card-link">
+                            Ver foro <i class="fa-solid fa-arrow-right"></i>
                         </a>
-
                     </article>
-
                 {% endfor %}
-
             </div>
-
         {% else %}
-
             <div class="empty-state">
-
                 <i class="fa-regular fa-comments"></i>
-
-                <h3>
-                    Todavía no tienes foros
-                </h3>
-
-                <p>
-                    Crea un foro para comenzar una comunidad.
-                </p>
-
-                <a
-                    href="#"
-                    class="primary-button"
-                >
-                    Crear mi primer foro
-                </a>
-
+                <h3>Todavía no tienes foros</h3>
+                <p>Crea un foro para comenzar una comunidad.</p>
+                <a href="{% url 'crear_foro' %}" class="primary-button">Crear mi primer foro</a>
             </div>
-
         {% endif %}
-
     </section>
 
 </div>
+
 
 {% endblock %}

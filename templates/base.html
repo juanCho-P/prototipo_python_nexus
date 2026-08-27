@@ -1,322 +1,168 @@
 {% load static %}
-
 <!DOCTYPE html>
 <html lang="es">
-
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-
-    <title>
-        Nexus | {% block title %}Dashboard{% endblock %}
-    </title>
-
-    <!-- Font Awesome -->
-    <link
-        rel="stylesheet"
-        href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css"
-    >
-
-    <!-- CSS principal del Dashboard -->
+    <title>Nexus | {% block title %}Dashboard{% endblock %}</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <link rel="stylesheet" href="{% static 'base.css' %}">
-
     {% block extra_css %}{% endblock %}
 </head>
-
 <body>
-
     <div class="app">
-
-        <!-- =========================
-             SIDEBAR
-        ========================== -->
-
+        <!-- SIDEBAR -->
         <aside class="sidebar" id="sidebar">
-
             <div class="sidebar-header">
-
-                <h2 class="logo">
-                    NEXUS
-                </h2>
-
-                <button
-                    type="button"
-                    class="sidebar-toggle"
-                    id="sidebarToggle"
-                    aria-label="Contraer menú"
-                >
+                <h2 class="logo">NEXUS</h2>
+                <button type="button" class="sidebar-toggle" id="sidebarToggle" aria-label="Contraer menú">
                     <i class="fa-solid fa-bars"></i>
                 </button>
-
             </div>
-
-
-            <!-- =========================
-                 NAVEGACIÓN
-            ========================== -->
 
             <nav class="sidebar-nav">
-
                 <ul>
-
-                    <li>
-                        <a href="{% url 'dashboard' %}"
-                           class="sidebar-link">
-
-                            <i class="fa-solid fa-chart-pie"></i>
-
-                            <span>Dashboard</span>
-
-                        </a>
-                    </li>
-
-
-                    <li>
-                        <a href="{% url 'event_list' %}"
-                           class="sidebar-link">
-
-                            <i class="fa-solid fa-compass"></i>
-
-                            <span>Descubrir Eventos</span>
-
-                        </a>
-                    </li>
-
-
-                    <li>
-                        <a href="{% url 'crear_evento' %}"
-                           class="sidebar-link">
-
-                            <i class="fa-solid fa-calendar-plus"></i>
-
-                            <span>Crear Evento</span>
-
-                        </a>
-                    </li>
-
-
-                    <li>
-                        <a href="{% url 'buscar_foro' %}"
-                           class="sidebar-link">
-
-                            <i class="fa-solid fa-comments"></i>
-
-                            <span>Descubrir Foros</span>
-
-                        </a>
-                    </li>
-
-
-                    <li>
-                        <a href="{% url 'crear_foro' %}"
-                           class="sidebar-link">
-
-                            <i class="fa-solid fa-comment-medical"></i>
-
-                            <span>Crear Foro</span>
-
-                        </a>
-                    </li>
-
-
-                    <li>
-                        <a href="{% url 'mis_foros_guardados' %}"
-                           class="sidebar-link">
-
-                            <i class="fa-solid fa-folder"></i>
-
-                            <span>Mis Foros Guardados</span>
-
-                        </a>
-                    </li>
-
-
-                     <li>
-                        <a href="{% url 'mis_eventos' %}"
-                           class="sidebar-link">
-
-                            <i class="fa-solid fa-folder"></i>
-
-                            <span>Mis Eventos</span>
-
-                        </a>
-                    </li>
-
+                    <li><a href="{% url 'dashboard' %}" class="sidebar-link"><i class="fa-solid fa-chart-pie"></i><span>Dashboard</span></a></li>
+                    <li><a href="{% url 'event_list' %}" class="sidebar-link"><i class="fa-solid fa-compass"></i><span>Descubrir Eventos</span></a></li>
+                    <li><a href="{% url 'crear_evento' %}" class="sidebar-link"><i class="fa-solid fa-calendar-plus"></i><span>Crear Evento</span></a></li>
+                    <li><a href="{% url 'buscar_foro' %}" class="sidebar-link"><i class="fa-solid fa-comments"></i><span>Descubrir Foros</span></a></li>
+                    <li><a href="{% url 'crear_foro' %}" class="sidebar-link"><i class="fa-solid fa-comment-medical"></i><span>Crear Foro</span></a></li>
+                    <li><a href="{% url 'mis_foros_guardados' %}" class="sidebar-link"><i class="fa-solid fa-folder"></i><span>Mis Foros Guardados</span></a></li>
                 </ul>
-
             </nav>
 
-
-            <!-- =========================
-                 CERRAR SESIÓN
-            ========================== -->
-
             <div class="sidebar-footer">
-
-                <form
-                    action="{% url 'logout' %}"
-                    method="post"
-                >
-
+                <form action="{% url 'logout' %}" method="post">
                     {% csrf_token %}
-
-                    <button
-                        type="submit"
-                        class="sidebar-link logout-button"
-                    >
-
+                    <button type="submit" class="sidebar-link logout-button">
                         <i class="fa-solid fa-arrow-right-from-bracket"></i>
-
                         <span>Cerrar sesión</span>
-
                     </button>
-
                 </form>
-
             </div>
-
         </aside>
 
-
-        <!-- =========================
-             CONTENIDO PRINCIPAL
-        ========================== -->
-
+        <!-- CONTENIDO PRINCIPAL -->
         <main class="main">
-
-            <!-- =========================
-                 TOPBAR
-            ========================== -->
-
+            <!-- TOPBAR -->
             <header class="topbar">
-
                 <div class="topbar-left">
-
-                    <button
-                        type="button"
-                        class="mobile-menu"
-                        id="mobileMenu"
-                    >
+                    <button type="button" class="mobile-menu" id="mobileMenu">
                         <i class="fa-solid fa-bars"></i>
                     </button>
-
                 </div>
 
-
                 <div class="topbar-right">
+                    <!-- NOTIFICACIONES (CONTENEDOR Y POPOVER) -->
+                    <div class="notifications-wrapper">
+                        <button type="button" class="topbar-icon" id="notifBtn" title="Notificaciones">
+                            <i class="fa-regular fa-bell"></i>
+                            {% if unread_notifications_count %}
+                                <span class="notif-badge" id="notifBadge">{{ unread_notifications_count }}</span>
+                            {% endif %}
+                        </button>
 
-                    <!-- Notificaciones -->
+                        <!-- Panel flotante tipo Popover -->
+                        <div class="notifications-popover" id="notifPopover">
+                            <div class="popover-header">
+                                <h3>Notificaciones</h3>
+                                <button type="button" class="btn-clear-all" id="markAllReadBtn">Marcar leídas</button>
+                            </div>
+                            <div class="popover-body" id="notifList">
+                                {% if notificaciones %}
+                                    {% for notif in notificaciones %}
+                                        <div class="notif-item {% if not notif.leida %}unread{% endif %} {% if notif.tipo == 'warning' %}is-warning{% endif %}">
+                                            <div class="notif-icon">
+                                                {% if notif.tipo == 'warning' %}
+                                                    <i class="fa-solid fa-triangle-exclamation"></i>
+                                                {% else %}
+                                                    <i class="fa-solid fa-circle-info"></i>
+                                                {% endif %}
+                                            </div>
+                                            <div class="notif-content">
+                                                <p class="notif-title">{{ notif.titulo }}</p>
+                                                <p class="notif-message">{{ notif.mensaje }}</p>
+                                                <span class="notif-time">{{ notif.created_at|timesince }}</span>
+                                            </div>
+                                        </div>
+                                    {% endfor %}
+                                {% else %}
+                                    <div class="empty-notif">No tienes notificaciones.</div>
+                                {% endif %}
+                            </div>
+                        </div>
+                    </div>
 
-                    <button
-                        type="button"
-                        class="topbar-icon"
-                        title="Notificaciones"
-                    >
-
-                        <i class="fa-regular fa-bell"></i>
-
-                    </button>
-
-
-                    <!-- Perfil -->
-
-                    <a
-                        href="{% url 'perfil' %}"
-                        class="profile-button"
-                    >
-
+                    <!-- PERFIL -->
+                    <a href="{% url 'perfil' %}" class="profile-button">
                         {% if request.user.avatar %}
-                            <img
-                                src="{{ request.user.avatar.url }}"
-                                alt="Avatar"
-                                class="profile-avatar"
-                            >
+                            <img src="{{ request.user.avatar.url }}" alt="Avatar" class="profile-avatar">
                         {% else %}
                             <div class="profile-avatar default-avatar">
                                 <i class="fa-solid fa-user"></i>
                             </div>
                         {% endif %}
-
-                        <span class="profile-name">
-                            {{ request.user.username }}
-                        </span>
-
+                        <span class="profile-name">{{ request.user.username }}</span>
                     </a>
-
                 </div>
-
             </header>
 
-
-            <!-- =========================
-                 CONTENIDO VARIABLE
-            ========================== -->
-
             <section class="content">
-
                 {% if messages %}
-
                     <div class="messages">
-
                         {% for message in messages %}
-
-                            <div class="message {{ message.tags }}">
-                                {{ message }}
-                            </div>
-
+                            <div class="message {{ message.tags }}">{{ message }}</div>
                         {% endfor %}
-
                     </div>
-
                 {% endif %}
 
-
-                {% block content %}
-
-                {% endblock %}
-
+                {% block content %}{% endblock %}
             </section>
-
         </main>
-
     </div>
 
-
-    <!-- JavaScript del Dashboard -->
-
+    <!-- JAVASCRIPT -->
     <script>
-
+        // Toggle Sidebar
         const sidebar = document.getElementById("sidebar");
-        const sidebarToggle = document.getElementById("sidebarToggle");
-        const mobileMenu = document.getElementById("mobileMenu");
+        document.getElementById("sidebarToggle").addEventListener("click", () => sidebar.classList.toggle("collapsed"));
+        document.getElementById("mobileMenu").addEventListener("click", () => sidebar.classList.toggle("mobile-open"));
 
+        // Modal Flotante de Notificaciones
+        const notifBtn = document.getElementById("notifBtn");
+        const notifPopover = document.getElementById("notifPopover");
 
-        /*
-         * Contraer / expandir sidebar
-         */
-
-        sidebarToggle.addEventListener("click", () => {
-
-            sidebar.classList.toggle("collapsed");
-
+        notifBtn.addEventListener("click", (e) => {
+            e.stopPropagation();
+            notifPopover.classList.toggle("active");
         });
 
-
-        /*
-         * Menú en dispositivos pequeños
-         */
-
-        mobileMenu.addEventListener("click", () => {
-
-            sidebar.classList.toggle("mobile-open");
-
+        document.addEventListener("click", (e) => {
+            if (!notifPopover.contains(e.target) && !notifBtn.contains(e.target)) {
+                notifPopover.classList.remove("active");
+            }
         });
 
+        // Marcar Notificaciones como leídas AJAX
+        const markAllBtn = document.getElementById("markAllReadBtn");
+        if (markAllBtn) {
+            markAllBtn.addEventListener("click", () => {
+                fetch("{% url 'marcar_notificaciones_leidas' %}", {
+                    method: "POST",
+                    headers: {
+                        "X-CSRFToken": "{{ csrf_token }}",
+                        "Content-Type": "application/json"
+                    }
+                }).then(res => {
+                    if (res.ok) {
+                        const badge = document.getElementById("notifBadge");
+                        if (badge) badge.remove();
+                        document.querySelectorAll(".notif-item.unread").forEach(el => el.classList.remove("unread"));
+                    }
+                });
+            });
+        }
     </script>
-
-
     {% block extra_js %}{% endblock %}
-
 </body>
-
 </html>

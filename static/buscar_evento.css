@@ -1,0 +1,327 @@
+/* =========================================
+   EXPLORADOR DE EVENTOS - DESIGN SYSTEM NEXUS
+   ========================================= */
+
+.events-explorer-container {
+    max-width: 1200px;
+    margin: 0 auto;
+    padding: 2rem 1rem;
+}
+
+/* -----------------------------------------
+   ENCABEZADO Y BARRA DE BÚSQUEDA AMPLIADA
+   ----------------------------------------- */
+.search-header-stellar {
+    text-align: center;
+    margin-bottom: 3rem;
+    padding: 0 1rem;
+}
+
+.search-title {
+    color: var(--color-text-primary, #ffffff);
+    font-family: 'Montserrat', sans-serif;
+    font-size: 2.4rem;
+    font-weight: 700;
+    margin-bottom: 0.5rem;
+    letter-spacing: -0.5px;
+}
+
+.search-subtitle {
+    color: var(--color-text-secondary, #a0aec0);
+    font-size: 0.98rem;
+    margin-bottom: 2rem;
+}
+
+.search-bar-form {
+    display: flex;
+    justify-content: center;
+    width: 100%;
+}
+
+/* Ocupa el espacio amplio del contenedor */
+.search-inputs-group {
+    display: flex;
+    gap: 0.8rem;
+    width: 100%;
+    max-width: 1000px;
+    align-items: center;
+}
+
+.category-select {
+    padding: 0.85rem 1.25rem;
+    border-radius: var(--radius-pill, 50px);
+    border: 1px solid var(--color-border, rgba(255, 255, 255, 0.1));
+    background: var(--color-surface, #161b22);
+    color: var(--color-text-primary, #ffffff);
+    font-family: 'Montserrat', sans-serif;
+    font-size: 0.9rem;
+    font-weight: 500;
+    outline: none;
+    cursor: pointer;
+    transition: border-color var(--transition-fast, 0.2s);
+}
+
+.category-select:focus,
+.category-select:hover {
+    border-color: var(--color-border-hover, #6366f1);
+}
+
+.search-input-wrapper {
+    position: relative;
+    display: flex;
+    align-items: center;
+    flex: 1;
+}
+
+.search-icon {
+    position: absolute;
+    left: 1.2rem;
+    color: var(--color-text-secondary, #718096);
+    font-size: 0.95rem;
+    z-index: 2;
+}
+
+.search-input {
+    width: 100%;
+    padding: 0.85rem 7.5rem 0.85rem 3rem;
+    border-radius: var(--radius-pill, 50px);
+    border: 1px solid var(--color-border, rgba(255, 255, 255, 0.1));
+    background: var(--color-surface, #161b22);
+    color: var(--color-text-primary, #ffffff);
+    font-family: 'Montserrat', sans-serif;
+    font-size: 0.9rem;
+    outline: none;
+    transition: border-color var(--transition-fast, 0.2s);
+}
+
+.search-input:focus {
+    border-color: var(--color-border-hover, #6366f1);
+}
+
+.search-btn {
+    position: absolute;
+    right: 5px;
+    padding: 0.6rem 1.4rem;
+    border-radius: var(--radius-pill, 50px);
+    border: none;
+    background: var(--button-primary, #6366f1);
+    color: var(--color-text-light, #ffffff);
+    font-family: 'Montserrat', sans-serif;
+    font-weight: 600;
+    font-size: 0.88rem;
+    cursor: pointer;
+    transition: background var(--transition-fast, 0.2s), transform var(--transition-fast, 0.2s);
+}
+
+.search-btn:hover {
+    background: var(--button-primary-hover, #4f46e5);
+    transform: translateY(-1px);
+}
+
+/* -----------------------------------------
+   GRILLA DE EVENTOS
+   ----------------------------------------- */
+.events-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+    gap: 2rem;
+}
+
+/* -----------------------------------------
+   TARJETA ESTILO REFERENCIA (IMAGE TOP CARD)
+   ----------------------------------------- */
+.event-card {
+    background: var(--color-surface, #ffffff);
+    border-radius: 24px;
+    overflow: hidden;
+    border: 1px solid var(--color-border, rgba(255, 255, 255, 0.08));
+    box-shadow: var(--shadow-card, 0 10px 30px rgba(0,0,0,0.15));
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+    height: 100%;
+    transition: transform 0.3s ease, box-shadow 0.3s ease;
+}
+
+.event-card:hover {
+    transform: translateY(-6px);
+    box-shadow: 0 18px 36px rgba(0, 0, 0, 0.25);
+}
+
+/* Imagen de portada superior */
+.card-image-top {
+    position: relative;
+    width: 100%;
+    height: 200px;
+    overflow: hidden;
+}
+
+.card-img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    border-top-left-radius: 24px;
+    border-top-right-radius: 24px;
+    transition: transform 0.4s ease;
+}
+
+.event-card:hover .card-img {
+    transform: scale(1.04);
+}
+
+/* Botones flotantes (Editar/Reportar) */
+.card-top-actions {
+    position: absolute;
+    top: 12px;
+    right: 12px;
+    display: flex;
+    gap: 6px;
+    z-index: 3;
+}
+
+.icon-btn {
+    width: 34px;
+    height: 34px;
+    border-radius: 50%;
+    background: rgba(0, 0, 0, 0.45);
+    backdrop-filter: blur(6px);
+    color: #ffffff;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    text-decoration: none;
+    font-size: 0.85rem;
+    transition: background 0.2s, transform 0.2s;
+}
+
+.icon-btn.edit-btn:hover { background: #3b82f6; transform: scale(1.1); }
+.icon-btn.report-btn:hover { background: #ef4444; transform: scale(1.1); }
+
+/* Cuerpo de la tarjeta */
+.card-body {
+    padding: 1.25rem 1.25rem 0.5rem 1.25rem;
+    flex-grow: 1;
+    display: flex;
+    flex-direction: column;
+}
+
+.event-categories-badges {
+    display: flex;
+    gap: 0.4rem;
+    flex-wrap: wrap;
+    margin-bottom: 0.6rem;
+}
+
+.category-badge {
+    background: rgba(99, 102, 241, 0.12);
+    color: var(--button-primary, #6366f1);
+    border: 1px solid rgba(99, 102, 241, 0.25);
+    font-size: 0.72rem;
+    padding: 0.25rem 0.7rem;
+    border-radius: 50px;
+    font-weight: 600;
+}
+
+/* Control de desbordamiento en Título */
+.event-card-title {
+    font-family: 'Montserrat', sans-serif;
+    font-size: 1.25rem;
+    font-weight: 700;
+    margin: 0 0 0.5rem 0;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+
+.event-card-title a {
+    color: var(--color-text-primary, #1e293b);
+    text-decoration: none;
+}
+
+.event-meta {
+    display: flex;
+    flex-direction: column;
+    gap: 0.3rem;
+    font-size: 0.82rem;
+    color: var(--color-text-secondary, #64748b);
+    margin-bottom: 0.8rem;
+}
+
+/* Control de desbordamiento en Descripción */
+.event-card-description {
+    font-size: 0.88rem;
+    color: var(--color-text-secondary, #475569);
+    line-height: 1.45;
+    margin-bottom: 1rem;
+    display: -webkit-box;
+    -webkit-line-clamp: 3;
+    line-clamp: 3;
+    -webkit-box-orient: vertical;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    min-height: 3.8em;
+}
+
+/* -----------------------------------------
+   FOOTER CON ACCIONES Y ASISTENTES
+   ----------------------------------------- */
+.card-footer {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 0.9rem 1.25rem 1.25rem 1.25rem;
+}
+
+.stat-item {
+    font-size: 0.85rem;
+    font-weight: 600;
+    color: var(--color-text-secondary, #64748b);
+    display: flex;
+    align-items: center;
+    gap: 0.4rem;
+}
+
+.footer-buttons {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+}
+
+/* Botón estilo Pill como el de la imagen (Read More / Unirse) */
+.btn-action, .btn-detail {
+    padding: 0.5rem 1.1rem;
+    border-radius: 50px;
+    font-size: 0.82rem;
+    font-weight: 600;
+    text-decoration: none;
+    transition: transform 0.2s, background 0.2s;
+}
+
+.btn-join {
+    background: #e0f2fe;
+    color: #0369a1;
+}
+
+.btn-leave {
+    background: #ffe4e6;
+    color: #be123c;
+}
+
+.btn-detail {
+    background: #f1f5f9;
+    color: #334155;
+}
+
+.btn-action:hover, .btn-detail:hover {
+    transform: scale(1.03);
+}
+
+/* Adaptación responsive */
+@media (max-width: 640px) {
+    .search-inputs-group {
+        flex-direction: column;
+    }
+    .search-input-wrapper, .category-select {
+        width: 100%;
+    }
+}

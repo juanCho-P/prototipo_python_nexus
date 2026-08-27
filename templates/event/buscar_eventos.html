@@ -1,0 +1,143 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}Explorar Eventos - Nexus{% endblock %}
+
+{% block extra_css %}
+<link rel="stylesheet" href="{% static 'buscar_evento.css' %}">
+{% endblock %}
+
+{% block content %}
+<div class="events-explorer-container">
+
+   
+    <div class="search-header-stellar">
+        <h1 class="search-title">Eventos y Encuentros</h1>
+        <p class="search-subtitle">Descubre próximos eventos, únete a comunidades y participa.</p>
+        
+        <form method="GET" action="" class="search-bar-form">
+            <div class="search-inputs-group">
+                <select name="categoria" class="category-select" onchange="this.form.submit()">
+                    <option value="">Todas las categorías</option>
+                    {% for cat in categorias %}
+                        <option value="{{ cat.id }}" {% if request.GET.categoria == cat.id|stringformat:"s" %}selected{% endif %}>
+                            {{ cat.nombre }}
+                        </option>
+                    {% endfor %}
+                </select>
+
+                <select name="orden" class="category-select" onchange="this.form.submit()">
+                    <option value="proximos" {% if orden_actual == 'proximos' or not orden_actual %}selected{% endif %}>Más próximos</option>
+                    <option value="populares" {% if orden_actual == 'populares' %}selected{% endif %}>Más populares</option>
+                    <option value="recientes" {% if orden_actual == 'recientes' %}selected{% endif %}>Recientemente creados</option>
+                </select>
+
+                <div class="search-input-wrapper">
+                    <i class="fa-solid fa-magnifying-glass search-icon"></i>
+                    <input type="text" name="q" placeholder="Buscar por título, descripción o ubicación..." value="{{ request.GET.q|default:'' }}" class="search-input">
+                    <button type="submit" class="search-btn">Buscar</button>
+                </div>
+            </div>
+        </form>
+    </div>
+
+    <!-- Grilla de Tarjetas -->
+    <div class="events-grid">
+        {% for evento in page_obj %}
+            <div class="event-card">
+                
+                <!-- Imagen Superior -->
+                <div class="card-image-top">
+                    {% if evento.imagen %}
+                        <img src="{{ evento.imagen.url }}" alt="{{ evento.titulo }}" class="card-img">
+                    {% else %}
+                        <img src="{% static 'images/default_event.jpg' %}" alt="Imagen por defecto" class="card-img">
+                    {% endif %}
+                    
+                    <div class="card-top-actions">
+                        {% if request.user == evento.id_creador %}
+                            <a href="{% url 'editar_evento' evento.id %}" class="icon-btn edit-btn" title="Editar Evento">
+                                <i class="fa-solid fa-pen-to-square"></i>
+                            </a>
+                        {% else %}
+                            <a href="{% url 'reportar_evento' evento.id %}" class="icon-btn report-btn" title="Reportar contenido inapropiado">
+                                <i class="fa-solid fa-flag"></i>
+                            </a>
+                        {% endif %}
+                    </div>
+                </div>
+
+                <!-- Cuerpo de la Tarjeta -->
+                <div class="card-body">
+                    <div class="event-categories-badges">
+                        {% for cat in evento.categoria.all %}
+                            <span class="category-badge">{{ cat.nombre }}</span>
+                        {% endfor %}
+                    </div>
+
+                    <h3 class="event-card-title" title="{{ evento.titulo }}">
+                        <a href="{% url 'evento_detalle' evento.id %}">{{ evento.titulo }}</a>
+                    </h3>
+
+                    <div class="event-meta">
+                        <span><i class="fa-regular fa-calendar-days"></i> {{ evento.f_inicio|date:"d M Y, h:i A" }}</span>
+                        {% if evento.ubicacion %}
+                            <span><i class="fa-solid fa-location-dot"></i> {{ evento.ubicacion }}</span>
+                        {% endif %}
+                    </div>
+
+                    <p class="event-card-description">
+                        {{ evento.descripcion }}
+                    </p>
+                </div>
+
+                <!-- Footer de la Tarjeta -->
+                <div class="card-footer">
+                    <span class="stat-item" title="Asistentes confirmados">
+                        <i class="fa-solid fa-users"></i> {{ evento.total_asistentes|default:0 }}
+                    </span>
+
+                    <div class="footer-buttons">
+                        {% if request.user != evento.id_creador %}
+                            <a href="{% url 'unirse_evento' evento.id %}" class="btn-action {% if request.user in evento.asistentes.all %}btn-leave{% else %}btn-join{% endif %}">
+                                {% if request.user in evento.asistentes.all %}
+                                    <i class="fa-solid fa-user-minus"></i> Salir
+                                {% else %}
+                                    <i class="fa-solid fa-user-plus"></i> Asistiré
+                                {% endif %}
+                            </a>
+                        {% endif %}
+                        <a href="{% url 'evento_detalle' evento.id %}" class="btn-detail">Ver <i class="fa-solid fa-arrow-right"></i></a>
+                    </div>
+                </div>
+
+            </div>
+        {% empty %}
+            <div class="no-results-stellar">
+                <i class="fa-solid fa-calendar-xmark"></i>
+                <p>No se encontraron eventos publicados que coincidan con la búsqueda.</p>
+            </div>
+        {% endfor %}
+    </div>
+
+    <!-- Paginación -->
+    {% if page_obj.has_other_pages %}
+        <div class="pagination-stellar">
+            {% if page_obj.has_previous %}
+                <a href="?page={{ page_obj.previous_page_number }}{% if request.GET.q %}&q={{ request.GET.q }}{% endif %}{% if request.GET.categoria %}&categoria={{ request.GET.categoria }}{% endif %}{% if request.GET.orden %}&orden={{ request.GET.orden }}{% endif %}" class="page-link">
+                    <i class="fa-solid fa-chevron-left"></i> Anterior
+                </a>
+            {% endif %}
+
+            <span class="page-current">Página {{ page_obj.number }} de {{ page_obj.paginator.num_pages }}</span>
+
+            {% if page_obj.has_next %}
+                <a href="?page={{ page_obj.next_page_number }}{% if request.GET.q %}&q={{ request.GET.q }}{% endif %}{% if request.GET.categoria %}&categoria={{ request.GET.categoria }}{% endif %}{% if request.GET.orden %}&orden={{ request.GET.orden }}{% endif %}" class="page-link">
+                    Siguiente <i class="fa-solid fa-chevron-right"></i>
+                </a>
+            {% endif %}
+        </div>
+    {% endif %}
+
+</div>
+{% endblock %}

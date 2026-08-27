@@ -8,6 +8,7 @@ from django.core.mail import send_mail
 from django.urls import reverse
 from django.utils.http import urlsafe_base64_decode, urlsafe_base64_encode
 from django.utils.encoding import force_bytes
+from django.db.models import Count
 
 from events.models import Evento
 from forums.models import Foro
@@ -15,18 +16,21 @@ from forums.models import Foro
 from .models import Usuario
 from .forms import RegistroForm, LoginForm, EditarPerfil, AvatarForm
 
+from django.http import JsonResponse
+from django.views.decorators.csrf import csrf_protect 
+from notification.models import Notificacion
+
 # -------------------------------------------
 # VISTAS PARA EL LOGIN, REGISTRO Y DASHBOARD
 # -------------------------------------------
 
-from django.http import JsonResponse
-from django.views.decorators.csrf import csrf_protect
 
-from django.shortcuts import render
-from django.http import JsonResponse
-from django.contrib.auth import authenticate, login as auth_login
-from django.urls import reverse
-from django.views.decorators.csrf import csrf_protect
+@login_required
+def marcar_notificaciones_leidas(request):
+    if request.method == 'POST':
+        Notificacion.objects.filter(usuario=request.user, leida=False).update(leida=True)
+        return JsonResponse({'status': 'ok'})
+    return JsonResponse({'status': 'error'}, status=400)
 
 @csrf_protect
 def login_view(request):
@@ -91,26 +95,32 @@ def registro_view(request):
 
 
 @login_required
-def dashboard(request):
-    eventos = Evento.objects.filter(id_creador=request.user)
-    foros = Foro.objects.filter(id_creador=request.user)
+def dashboard_view(request):
+    usuario = request.user
+    
+   
+    eventos = Evento.objects.filter(id_creador=usuario).prefetch_related('asistentes').order_by('-f_inicio')
+    foros = Foro.objects.filter(id_creador=usuario).order_by('-created_at')
+    
+  
+    evento_top = eventos.annotate(num_asistentes=Count('asistentes')).order_by('-num_asistentes').first()
+    
 
-    total_asistentes = sum(
-        evento.asistentes.count()
-        for evento in eventos
-    )
+    total_asistentes = sum(e.asistentes.count() for e in eventos)
+    
+  
+    strikes_count = getattr(usuario, 'strikes', 0)
 
     context = {
         'eventos': eventos,
         'foros': foros,
         'total_eventos': eventos.count(),
         'total_foros': foros.count(),
-        'total_asistentes': total_asistentes
+        'total_asistentes': total_asistentes,
+        'evento_top': evento_top,
+        'strikes_count': strikes_count,
     }
-
     return render(request, 'dashboard/dashboardUser.html', context)
-
-
 # ---------------------------------
 # VISTAS PARA EL PERFIL DEL USUARIO
 # ---------------------------------
@@ -120,7 +130,6 @@ def perfil_view(request):
     usuario = request.user
     return render(request, 'users/perfil.html', {'usuario': usuario})
 
-
 @login_required
 def editar_perfil(request):
     usuario = request.user
@@ -128,8 +137,10 @@ def editar_perfil(request):
     if request.method == 'POST':
         email_anterior = usuario.email
 
+        
         form = EditarPerfil(
             request.POST,
+            request.FILES,
             instance=usuario
         )
 
@@ -140,7 +151,6 @@ def editar_perfil(request):
                 usuario.email_verificado = False
                 usuario.save(update_fields=['email_verificado'])
 
-                # Reenvío de correo al cambiar la dirección email
                 enviar_correo_verificacion(request, usuario)
 
                 messages.warning(
@@ -158,26 +168,6 @@ def editar_perfil(request):
     return render(request, 'users/editar_perfil.html', {'form': form})
 
 
-@login_required
-def cambiar_avatar(request):
-    usuario = request.user
-
-    if request.method == 'POST':
-        form = AvatarForm(
-            request.POST,
-            request.FILES,
-            instance=usuario
-        )
-
-        if form.is_valid():
-            form.save()
-            messages.success(request, "Avatar actualizado correctamente.")
-            return redirect('perfil')
-
-    else:
-        form = AvatarForm(instance=usuario)
-
-    return render(request, 'users/cambiar_avatar.html', {'form': form})
 
 
 @login_required

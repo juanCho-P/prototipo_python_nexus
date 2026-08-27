@@ -52,7 +52,6 @@ INSTALLED_APPS = [
     'categorias',
     'report',
     'notification',
-    
 ]
 
 MIDDLEWARE = [

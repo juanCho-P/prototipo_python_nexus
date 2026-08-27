@@ -2,7 +2,6 @@ from django.urls import path
 from . import views
 from django.contrib.auth import views as auth_views
 
-
 urlpatterns = [
 
     # ----------------------------------------
@@ -29,7 +28,7 @@ urlpatterns = [
 
     path(
         'dashboard/',
-        views.dashboard,
+        views.dashboard_view,
         name='dashboard'
     ),
 
@@ -56,16 +55,23 @@ urlpatterns = [
         name='editar_perfil'
     ),
 
-    path(
-        'perfil/avatar/',
-        views.cambiar_avatar,
-        name='editar_avatar'
-    ),
+
 
     path(
         'perfil/contrasena/',
         views.cambiar_contrasena,
         name='cambiar_contrasena'
+    ),
+
+
+    # ----------------------------------------
+    # NOTIFICACIONES
+    # ----------------------------------------
+
+    path(
+        'notificaciones/marcar-leidas/',
+        views.marcar_notificaciones_leidas,
+        name='marcar_notificaciones_leidas'
     ),
 
 

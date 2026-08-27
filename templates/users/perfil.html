@@ -1,11 +1,126 @@
-<!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Document</title>
-</head>
-<body>
-    <h1>Perfil del Usuario</h1>
-</body>
-</html>
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}Mi Perfil{% endblock %}
+
+
+{% block extra_css %}
+<link rel="stylesheet" href="{% static 'editar_perfil.css' %}">
+{% endblock %}
+
+{% block content %}
+<div class="profile-page">
+
+    <!-- ENCABEZADO DE PERFIL -->
+    <div class="profile-header-card">
+        <div class="profile-avatar-wrapper">
+            {% if usuario.avatar %}
+                <img src="{{ usuario.avatar.url }}" alt="{{ usuario.username }}" class="profile-avatar-lg">
+            {% else %}
+                <div class="profile-avatar-lg default-avatar">
+                    <i class="fa-solid fa-user"></i>
+                </div>
+            {% endif %}
+
+            <!-- ✅ SE CORRIGIÓ LA URL AQUÍ: Ahora apunta a 'editar_perfil' -->
+            <a href="{% url 'editar_perfil' %}" class="avatar-edit-btn" title="Cambiar foto de perfil">
+                <i class="fa-solid fa-camera"></i>
+            </a>
+        </div>
+
+        <div class="profile-main-info">
+            <h2>{{ usuario.nombres|default:usuario.username }}</h2>
+            <p class="profile-username">@{{ usuario.username }}</p>
+            
+            <div class="profile-badges">
+                {% if usuario.email_verificado %}
+                    <span class="badge badge-success">
+                        <i class="fa-solid fa-circle-check"></i> Correo verificado
+                    </span>
+                {% else %}
+                    <span class="badge badge-warning">
+                        <i class="fa-solid fa-triangle-exclamation"></i> Correo no verificado
+                    </span>
+                {% endif %}
+                
+                <span class="badge badge-info">
+                    <i class="fa-solid fa-shield"></i> {{ usuario.strikes|default:0 }} Strikes
+                </span>
+            </div>
+        </div>
+
+        <div class="profile-actions">
+            <a href="{% url 'editar_perfil' %}" class="primary-button">
+                <i class="fa-solid fa-pen-to-square"></i> Editar Perfil
+            </a>
+        </div>
+    </div>
+
+    <!-- DETALLES DE LA CUENTA -->
+    <div class="profile-details-grid">
+
+        <!-- INFORMACIÓN PERSONAL -->
+        <div class="profile-card">
+            <div class="card-title">
+                <i class="fa-regular fa-user"></i>
+                <h3>Información Personal</h3>
+            </div>
+            
+            <div class="info-list">
+                <div class="info-item">
+                    <span class="info-label">Nombre completo</span>
+                    <span class="info-value">{{ usuario.nombres|default:"No especificado" }}</span>
+                </div>
+
+                <div class="info-item">
+                    <span class="info-label">Correo electrónico</span>
+                    <span class="info-value">{{ usuario.email }}</span>
+                </div>
+
+                <div class="info-item">
+                    <span class="info-label">Miembro desde</span>
+                    <span class="info-value">{{ usuario.date_joined|date:"d \d\e F \d\e Y" }}</span>
+                </div>
+            </div>
+        </div>
+
+        <!-- SEGURIDAD Y CONFIGURACIÓN -->
+        <div class="profile-card">
+            <div class="card-title">
+                <i class="fa-solid fa-lock"></i>
+                <h3>Seguridad y Ajustes</h3>
+            </div>
+
+            <div class="security-actions">
+                <div class="action-row">
+                    <div>
+                        <strong>Contraseña</strong>
+                        <p>Te recomendamos cambiar tu contraseña periódicamente.</p>
+                    </div>
+                    <a href="{% url 'cambiar_contrasena' %}" class="secondary-button">
+                        Cambiar
+                    </a>
+                </div>
+
+                {% if not usuario.email_verificado %}
+                    <div class="action-row">
+                        <div>
+                            <strong>Verificación de Email</strong>
+                            <p>Reenvía el enlace si aún no has confirmado tu cuenta.</p>
+                        </div>
+                       
+                        <form action="{% url 'enviar_verificacion_email' %}" method="post">
+                            {% csrf_token %}
+                            <button type="submit" class="secondary-button">
+                                Reenviar correo
+                            </button>
+                        </form>
+                    </div>
+                {% endif %}
+            </div>
+        </div>
+
+    </div>
+
+</div>
+{% endblock %}
