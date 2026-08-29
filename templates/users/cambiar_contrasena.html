@@ -1,0 +1,56 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}Cambiar Contraseña{% endblock %}
+{% block extra_css %}
+<link rel="stylesheet" href="{% static 'cambiar_contrasena.css' %}">
+{% endblock %}
+
+{% block content %}
+<div class="edit-profile-card">
+    <div class="card-header">
+        <h2>Cambiar Contraseña</h2>
+        <p>Asegúrate de ingresar una contraseña segura que cumpla con los requisitos del sistema.</p>
+    </div>
+
+    {% if messages %}
+        <div class="messages-container">
+            {% for message in messages %}
+                <div class="alert alert-{{ message.tags }}">
+                    {{ message }}
+                </div>
+            {% endfor %}
+        </div>
+    {% endif %}
+
+    <form method="post" class="edit-profile-form">
+        {% csrf_token %}
+
+        <div class="form-grid-single">
+            {% for field in form %}
+                <div class="form-group">
+                    <label for="{{ field.id_for_label }}">{{ field.label }}</label>
+                    {{ field }}
+                    
+                    {% if field.help_text %}
+                        <div class="password-help-text">
+                            {{ field.help_text|safe }}
+                        </div>
+                    {% endif %}
+                    
+                    {% if field.errors %}
+                        {% for error in field.errors %}
+                            <span class="field-error"><i class="fa-solid fa-circle-exclamation"></i> {{ error }}</span>
+                        {% endfor %}
+                    {% endif %}
+                </div>
+            {% endfor %}
+        </div>
+
+        <div class="form-actions">
+            <a href="{% url 'perfil' %}" class="btn-cancel">Cancelar</a>
+            <button type="submit" class="btn-save">Actualizar Contraseña</button>
+        </div>
+    </form>
+</div>
+{% endblock %}

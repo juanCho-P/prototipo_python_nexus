@@ -1,11 +1,119 @@
-<!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Document</title>
-</head>
-<body>
-    <h1>Editar Perfil</h1>
-</body>
-</html>
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}Editar Perfil{% endblock %}
+
+
+{% block extra_css %}
+<link rel="stylesheet" href="{% static 'editar_perfil.css' %}">
+{% endblock %}
+
+{% block content %}
+<div class="edit-profile-card">
+    <div class="card-header">
+        <h2>Editar Información de Perfil</h2>
+        <p>Actualiza tus datos personales y tu foto de perfil.</p>
+    </div>
+
+    <form method="post" enctype="multipart/form-data" class="edit-profile-form">
+        {% csrf_token %}
+
+        {% if messages %}
+            <div class="messages-container">
+                {% for message in messages %}
+                    <div class="alert alert-{{ message.tags }}">
+                        {{ message }}
+                    </div>
+                {% endfor %}
+            </div>
+        {% endif %}
+
+        <!-- AVATAR UPLOAD -->
+        <div class="avatar-upload-group">
+            <div class="avatar-preview-wrapper">
+                {% if usuario.avatar %}
+                    <img src="{{ usuario.avatar.url }}" alt="Avatar" id="avatarPreview" class="avatar-preview">
+                {% else %}
+                    <div class="avatar-preview default-avatar-box" id="avatarFallback">
+                        <i class="fa-solid fa-user"></i>
+                    </div>
+                    <img src="" alt="Avatar" id="avatarPreview" class="avatar-preview hidden">
+                {% endif %}
+            </div>
+            
+            <div class="avatar-input-wrapper">
+                <label for="{{ form.avatar.id_for_label }}" class="btn-select-avatar">
+                    <i class="fa-solid fa-camera"></i> Cambiar Imagen
+                </label>
+                {{ form.avatar }}
+                <small class="help-text">Formato JPEG/PNG. Se ajustará automáticamente a 96x96 px.</small>
+                {% if form.avatar.errors %}
+                    <span class="field-error">{{ form.avatar.errors.0 }}</span>
+                {% endif %}
+            </div>
+        </div>
+
+        <!-- CAMPOS DEL FORMULARIO -->
+        <div class="form-grid">
+            <div class="form-group">
+                <label for="{{ form.nombres.id_for_label }}">Nombres</label>
+                {{ form.nombres }}
+                {% if form.nombres.errors %}
+                    <span class="field-error">{{ form.nombres.errors.0 }}</span>
+                {% endif %}
+            </div>
+
+            <div class="form-group">
+                <label for="{{ form.apellidos.id_for_label }}">Apellidos</label>
+                {{ form.apellidos }}
+                {% if form.apellidos.errors %}
+                    <span class="field-error">{{ form.apellidos.errors.0 }}</span>
+                {% endif %}
+            </div>
+
+            <div class="form-group">
+                <label for="{{ form.username.id_for_label }}">Nombre de Usuario</label>
+                {{ form.username }}
+                {% if form.username.errors %}
+                    <span class="field-error">{{ form.username.errors.0 }}</span>
+                {% endif %}
+            </div>
+
+            <div class="form-group">
+                <label for="{{ form.email.id_for_label }}">Correo Electrónico</label>
+                {{ form.email }}
+                {% if form.email.errors %}
+                    <span class="field-error">{{ form.email.errors.0 }}</span>
+                {% endif %}
+            </div>
+        </div>
+
+        <div class="form-actions">
+            <a href="{% url 'perfil' %}" class="btn-cancel">Cancelar</a>
+            <button type="submit" class="btn-save">Guardar Cambios</button>
+        </div>
+    </form>
+</div>
+
+<script>
+    // Previsualización de imagen al seleccionarla
+    const avatarInput = document.getElementById('{{ form.avatar.id_for_label }}');
+    const avatarPreview = document.getElementById('avatarPreview');
+    const avatarFallback = document.getElementById('avatarFallback');
+
+    if (avatarInput) {
+        avatarInput.addEventListener('change', function(e) {
+            const file = e.target.files[0];
+            if (file) {
+                const reader = new FileReader();
+                reader.onload = function(event) {
+                    avatarPreview.src = event.target.result;
+                    avatarPreview.classList.remove('hidden');
+                    if (avatarFallback) avatarFallback.style.display = 'none';
+                }
+                reader.readAsDataURL(file);
+            }
+        });
+    }
+</script>
+{% endblock %}

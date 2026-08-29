@@ -14,7 +14,7 @@ from events.models import Evento
 from forums.models import Foro
 
 from .models import Usuario
-from .forms import RegistroForm, LoginForm, EditarPerfil, AvatarForm
+from .forms import RegistroForm, LoginForm, EditarPerfil
 
 from django.http import JsonResponse
 from django.views.decorators.csrf import csrf_protect 

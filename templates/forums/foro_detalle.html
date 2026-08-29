@@ -47,6 +47,7 @@
                         <i class="fa-regular fa-bookmark"></i> Guardar
                     {% endif %}
                 </a>
+
                 {% if request.user.is_authenticated and request.user != foro.id_creador %}
                     <button type="button" class="btn-join-forum" style="background: #ef4444; color: #fff;" onclick="openReportModal('foro', '{{ foro.id }}')">
                         <i class="fa-solid fa-flag"></i> Reportar
@@ -207,7 +208,7 @@
 
 </div>
 
-<!-- Modal de Reporte con Contraste Optimizado -->
+<!-- Modal de Reporte -->
 <div id="reportModal" class="report-modal-overlay" style="display: none;">
     <div class="report-modal-content">
         <div class="report-modal-header">
@@ -216,23 +217,20 @@
         </div>
         <form id="reportForm" method="POST" action="">
             {% csrf_token %}
-            <input type="hidden" name="tipo_objeto" id="report_tipo_objeto">
-            <input type="hidden" name="objeto_id" id="report_objeto_id">
             
             <div class="report-form-group">
                 <label for="motivo">Motivo del reporte:</label>
                 <select name="motivo" id="motivo" class="search-input" style="width: 100%; padding: 0.6rem;" required>
                     <option value="" disabled selected>Selecciona una opción</option>
-                    <option value="SPAM">Spam o publicidad no deseada</option>
-                    <option value="OFENSIVO">Lenguaje ofensivo o acoso</option>
-                    <option value="INAPROPIADO">Contenido inapropiado</option>
-                    <option value="OTRO">Otro motivo</option>
+                    {% for clave, valor in motivos_reporte %}
+                        <option value="{{ clave }}">{{ valor }}</option>
+                    {% endfor %}
                 </select>
             </div>
 
             <div class="report-form-group" style="margin-bottom: 1.5rem;">
-                <label for="descripcion_reporte">Detalles adicionales:</label>
-                <textarea name="descripcion" id="descripcion_reporte" rows="3" class="search-input" style="width: 100%; padding: 0.6rem; resize: vertical;" placeholder="Explica brevemente la razón del reporte..."></textarea>
+                <label for="comentario_adicional">Detalles adicionales:</label>
+                <textarea name="comentario_adicional" id="comentario_adicional" rows="3" class="search-input" style="width: 100%; padding: 0.6rem; resize: vertical;" placeholder="Explica brevemente la razón del reporte..."></textarea>
             </div>
 
             <div style="display: flex; justify-content: flex-end; gap: 0.8rem;">
@@ -258,13 +256,11 @@ function openReportModal(tipo, id) {
     const form = document.getElementById('reportForm');
     
     if (tipo === 'foro') {
-        form.action = `/reportes/foro/${id}/`;
+        form.action = "{% url 'reportar_foro' 0 %}".replace('0', id);
     } else if (tipo === 'comentario') {
-        form.action = `/reportes/comentario/${id}/`;
+        form.action = "{% url 'reportar_comentario' 0 %}".replace('0', id);
     }
 
-    document.getElementById('report_tipo_objeto').value = tipo;
-    document.getElementById('report_objeto_id').value = id;
     document.getElementById('reportModal').style.display = 'flex';
 }
 

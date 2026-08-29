@@ -5,7 +5,7 @@
 
 
 {% block extra_css %}
-<link rel="stylesheet" href="{% static 'editar_perfil.css' %}">
+<link rel="stylesheet" href="{% static 'perfil.css' %}">
 {% endblock %}
 
 {% block content %}
@@ -22,7 +22,7 @@
                 </div>
             {% endif %}
 
-            <!-- ✅ SE CORRIGIÓ LA URL AQUÍ: Ahora apunta a 'editar_perfil' -->
+           
             <a href="{% url 'editar_perfil' %}" class="avatar-edit-btn" title="Cambiar foto de perfil">
                 <i class="fa-solid fa-camera"></i>
             </a>

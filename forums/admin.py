@@ -11,6 +11,7 @@ class ForoAdmin(admin.ModelAdmin):
 
     search_fields = ('titulo', 'descripcion')
 
+   
 @admin.register(Comentario)
 class ComentarioAdmin(admin.ModelAdmin):
     list_display = ('id', 'id_foro', 'id_usuario', 'created_at', 'activo', 'created_at' , 'imagen')
@@ -19,5 +20,6 @@ class ComentarioAdmin(admin.ModelAdmin):
     @admin.display(boolean=True, description='imagen?')
     def has_image(self, obj):
         return bool(obj.imagen)
+
 
 

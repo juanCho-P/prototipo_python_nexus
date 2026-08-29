@@ -1,41 +1,57 @@
+from django.db import transaction
+from .models import Reporte
+
+from django.contrib.contenttypes.models import ContentType
 
 def validar_reporte(reporte):
+    if reporte.estado != 'PENDIENTE':
+        return False
 
-    reporte.estado = 'VALIDO'
-    reporte.save(update_fields=['estado'])
+    with transaction.atomic():
+        objeto = reporte.contenido_objeto  
+        autor_infractor = None
 
-    contenido = reporte.contenido_reportado
+        
+        if hasattr(objeto, 'id_creador') and objeto.id_creador:
+            autor_infractor = objeto.id_creador
+        elif hasattr(objeto, 'id_usuario') and objeto.id_usuario:
+            autor_infractor = objeto.id_usuario
 
-    if hasattr(contenido, 'id_usuario'):
-        usuario = contenido.id_usuario
+        if autor_infractor:
+            
+            autor_infractor.strikes = getattr(autor_infractor, 'strikes', 0) + 1
+            
+           
+            if autor_infractor.strikes >= 3:
+                autor_infractor.is_active = False
 
-    elif hasattr(contenido, 'id_creador'):
-        usuario = contenido.id_creador
+            autor_infractor.save()
 
-    else:
-        usuario = None
+           
+            if hasattr(reporte, 'reportado'):
+                reporte.reportado = autor_infractor
 
-    if usuario:
+        reporte.estado = 'APROBADO'
+        reporte.save()
 
-        usuario.strikes += 1
-
-        if usuario.strikes >= 3:
-            usuario.estado = 'BLOQUEADO'
-            usuario.is_active = False
-
-        usuario.save(
-            update_fields=[
-                'strikes',
-                'estado',
-                'is_active'
-            ]
-        )
-
+    return True
 
 def invalidar_reporte(reporte):
+    if reporte.estado == 'PENDIENTE':
+        reporte.estado = 'RECHAZADO'
+        reporte.save()
+        return True
+    return False
 
-    reporte.estado = 'INVALIDO'
 
-    reporte.save(
-        update_fields=['estado']
-    )
+
+
+
+def usuario_ya_reporto(usuario, objeto):
+    content_type = ContentType.objects.get_for_model(objeto)
+    return Reporte.objects.filter(
+        reportador=usuario,
+        content_type=content_type,
+        object_id=objeto.pk,
+        estado='PENDIENTE'
+    ).exists()

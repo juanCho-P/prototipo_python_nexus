@@ -9,6 +9,8 @@ from notification.models import Notificacion
 from categorias.models import Categoria
 from django.db.models import Q, Count
 from django.core.paginator import Paginator
+from .models import Reporte
+from report.services import  usuario_ya_reporto
 
 @login_required
 def buscar_eventos(request):
@@ -224,11 +226,9 @@ def reportar_evento(request, pk):
 @login_required
 def detalle_evento(request, pk):
     evento = get_object_or_404(Evento, pk=pk)
-    
-  
+
     actualizar_estado_evento(evento)
 
-  
     puede_ver = (
         evento.estado in ['PUBLICADO', 'FINALIZADO', 'CANCELADO']
         or evento.id_creador == request.user
@@ -240,12 +240,18 @@ def detalle_evento(request, pk):
 
     ya_asiste = evento.asistentes.filter(pk=request.user.pk).exists()
 
+    ya_reporto = False
+    if request.user.is_authenticated:
+        ya_reporto = usuario_ya_reporto(request.user, evento)
+
     context = {
         'evento': evento,
         'now': timezone.now(),
         'ya_asiste': ya_asiste,
+        'ya_reporto': ya_reporto,
         'total_asistentes': evento.asistentes.count(),
-        'es_creador': (evento.id_creador == request.user)
+        'es_creador': (evento.id_creador == request.user),
+        'motivos_reporte': Reporte.MOTIVOS_CHOICES
     }
 
     return render(request, 'event/evento_detalle.html', context)

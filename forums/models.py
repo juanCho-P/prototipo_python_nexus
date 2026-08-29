@@ -1,17 +1,17 @@
 from django.db import models 
 from django.conf import settings 
+from django.contrib.contenttypes.fields import GenericRelation
 from categorias.models import Categoria
-
-
+from report.models import Reporte
 
 
 class Foro(models.Model): 
     ESTADOS = [
-        ('PUBLICADO' ,'Publicado'),
+        ('PUBLICADO', 'Publicado'),
         ('BORRADOR', 'Borrador'),
-        ('OCULTO','Oculto por moderación'),
-        ('ELIMINADO','Eliminado por el creador'),
-        ('ELIMINADO_ADMIN','Eliminado por un administrador'),
+        ('OCULTO', 'Oculto por moderación'),
+        ('ELIMINADO', 'Eliminado por el creador'),
+        ('ELIMINADO_ADMIN', 'Eliminado por un administrador'),
     ]
 
     titulo = models.CharField(max_length=255) 
@@ -27,12 +27,14 @@ class Foro(models.Model):
         blank=True 
     )
 
-    
-    estado = models.CharField(max_length=20, choices=ESTADOS, default='PUBLICADO') # campo de texto para indicar el estado del foro, con opciones predefinidas
-    
-    def __str__(self):
+    estado = models.CharField(max_length=20, choices=ESTADOS, default='PUBLICADO')
 
+    # Relación genérica para reportes
+    reportes = GenericRelation(Reporte)
+
+    def __str__(self):
         return self.titulo
+
 
 class Comentario(models.Model): 
     respuesta = models.TextField() 
@@ -55,9 +57,14 @@ class Comentario(models.Model):
     )
 
     activo = models.BooleanField(default=True) 
+
+
+    reportes = GenericRelation(Reporte)
+
     def __str__(self):
         return f"{self.respuesta} por {self.id_usuario}"
-    
+
+
 class ForoGuardado(models.Model):
     usuario = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.CASCADE, related_name='foros_guardados')
     foro = models.ForeignKey(Foro, on_delete=models.CASCADE, related_name='guardado_por')

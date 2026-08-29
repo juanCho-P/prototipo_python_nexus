@@ -1,49 +1,35 @@
 from django.contrib import admin
+from django.contrib import messages
 from .models import Reporte
 from .services import validar_reporte, invalidar_reporte
 
-
-@admin.action(description='Validar reportes seleccionados (Aplicar Strike)')
-def action_validar_reporte(modeladmin, request, queryset):
+@admin.action(description='Validar reporte y aplicar +1 Strike al infractor')
+def aprobar_reportes_action(modeladmin, request, queryset):
+    procesados = 0
     for reporte in queryset:
-        validar_reporte(reporte)
+        if validar_reporte(reporte):
+            procesados += 1
+    modeladmin.message_user(
+        request, 
+        f"Se aprobaron {procesados} reportes exitosamente.", 
+        messages.SUCCESS
+    )
 
-@admin.action(description='Invalidar reportes seleccionados')
-def action_invalidar_reporte(modeladmin, request, queryset):
+@admin.action(description='Rechazar reportes seleccionados')
+def rechazar_reportes_action(modeladmin, request, queryset):
+    procesados = 0
     for reporte in queryset:
-        invalidar_reporte(reporte)
-
+        if invalidar_reporte(reporte):
+            procesados += 1
+    modeladmin.message_user(
+        request, 
+        f"Se rechazaron {procesados} reportes.", 
+        messages.INFO
+    )
 
 @admin.register(Reporte)
 class ReporteAdmin(admin.ModelAdmin):
-    list_display = (
-        'id',
-        'motivo',
-        'estado',
-        'id_usuario',
-        'contenido_reportado',
-        'created_at',
-    )
-    
-    list_filter = (
-        'estado',
-        'motivo',
-        'content_type',
-    )
-    
-    search_fields = (
-        'id_usuario__username',
-        'comentario_adicional',
-    )
-    
-    readonly_fields = (
-        'created_at',
-        'content_type',
-        'object_id',
-        'contenido_reportado',
-    )
-    
-    actions = [
-        action_validar_reporte,
-        action_invalidar_reporte,
-    ]
+    list_display = ('id', 'reportador', 'reportado', 'content_type', 'motivo', 'estado', 'created_at')
+    list_filter = ('estado', 'content_type', 'created_at')
+    search_fields = ('reportador__username', 'reportado__username', 'motivo')
+    actions = [aprobar_reportes_action, rechazar_reportes_action]

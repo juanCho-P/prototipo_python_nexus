@@ -91,8 +91,8 @@ DATABASES = {
     'default': {
         'ENGINE': 'django.db.backends.mysql',  # Le dice a Django que hablará con MySQL
         'NAME': 'nexus_db',                    # El nombre exacto de la base de datos en MySQL
-        'USER': 'root',                        # El usuario por defecto de XAMPP
-        'PASSWORD': '',                        # XAMPP por defecto viene sin contraseña (vacío)
+        'USER': 'root',                        
+        'PASSWORD': '',                        
         'HOST': '127.0.0.1',                   # Tu servidor local
         'PORT': '3306',                        # El puerto por defecto de MySQL
     }
@@ -161,5 +161,8 @@ CSRF_TRUSTED_ORIGINS = [
     'https://thermos-obsessed-shortage.ngrok-free.dev',
 ]
 
-EMAIL_BACKEND = 'django.core.mail.backends.console.EmailBackend'  # Configuración para enviar correos electrónicos a la consola durante el desarrollo
+EMAIL_BACKEND = 'django.core.mail.backends.filebased.EmailBackend'
+EMAIL_FILE_PATH = BASE_DIR / 'sent_emails' # Configuración para enviar correos electrónicos a la consola durante el desarrollo
 DEFAULT_FROM_EMAIL = 'noreply@nexus.com'
+
+LOGOUT_REDIRECT_URL = 'login'

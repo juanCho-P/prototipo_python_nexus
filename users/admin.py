@@ -34,8 +34,10 @@ class UsuarioAdmin(admin.ModelAdmin):
     )
 
     list_editable = (
-    'email_verificado',
-    'is_active',
+        'email_verificado',
+        'is_active',
+        'strikes'
+        
 )
 
 
