@@ -35,8 +35,10 @@ DEBUG = os.environ.get('DEBUG', 'False') == 'False'
 # Hosts permitidos dinámicos por entorno
 ALLOWED_HOSTS = ['nexus-hpqz.onrender.com', 'localhost', '127.0.0.1']
 
-
-# Application definition
+CSRF_TRUSTED_ORIGINS = [
+    'https://nexus-hpqz.onrender.com',
+]
+SECURE_PROXY_SSL_HEADER = ('HTTP_X_FORWARDED_PROTO', 'https')
 
 INSTALLED_APPS = [
     'jazzmin',
@@ -102,14 +104,12 @@ DATABASES = {
         'OPTIONS': {
             'ssl': {
                 'ca': os.path.join(BASE_DIR, 'ca.pem'),
-            }
-            
-        },
-
-        'connect_timeout': 60,
-        'read_timeout': 60,
-        'write_timeout': 60,
-        'init_command': "SET sql_mode='STRICT_TRANS_TABLES'",
+            },
+            'connect_timeout': 60,
+            'read_timeout': 60,
+            'write_timeout': 60,
+            'init_command': "SET sql_mode='STRICT_TRANS_TABLES'",
+        }
     }
 }
 
@@ -166,9 +166,7 @@ STATICFILES_STORAGE = 'whitenoise.storage.CompressedManifestStaticFilesStorage'
 
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 
-CSRF_TRUSTED_ORIGINS = [
-    'https://thermos-obsessed-shortage.ngrok-free.dev',
-]
+
 
 LOGOUT_REDIRECT_URL = 'login'
 

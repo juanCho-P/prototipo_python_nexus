@@ -95,3 +95,11 @@ body,
     border-radius: 8px !important;
     box-shadow: 0 6px 18px rgba(102, 109, 242, 0.25) !important;
 }
+
+
+.login-logo img, 
+.brand-image {
+    max-height: 50px !important;
+    width: auto !important;
+    object-fit: contain;
+}

@@ -325,3 +325,75 @@
         width: 100%;
     }
 }
+
+/* =========================================
+   RESPONSIVE DESIGN PARA MÓVILES (EVENTOS)
+   ========================================= */
+@media screen and (max-width: 768px) {
+    /* Contenedor y títulos */
+    .events-explorer-container {
+        padding: 1rem 0.8rem;
+    }
+
+    .search-title {
+        font-size: 1.8rem;
+    }
+
+    .search-subtitle {
+        font-size: 0.88rem;
+        margin-bottom: 1.5rem;
+    }
+
+    /* Apilar los elementos de búsqueda en columna */
+    .search-inputs-group {
+        flex-direction: column;
+        gap: 0.8rem;
+        align-items: stretch;
+        max-width: 100%;
+    }
+
+    /* Selectores de ancho completo en móvil */
+    .category-select {
+        width: 100%;
+        text-align: left;
+    }
+
+    /* Contenedor del input de búsqueda al 100% */
+    .search-input-wrapper {
+        width: 100%;
+        min-width: 100%;
+    }
+
+    /* Ajustar espaciado interno para evitar que el texto choque con el botón */
+    .search-input {
+        padding: 0.85rem 5.5rem 0.85rem 2.8rem;
+        font-size: 0.85rem;
+    }
+
+    .search-btn {
+        padding: 0.5rem 1rem;
+        font-size: 0.8rem;
+        right: 4px;
+    }
+
+    /* Grilla de eventos a una sola columna */
+    .events-grid {
+        grid-template-columns: 1fr;
+        gap: 1.5rem;
+    }
+
+    /* Ajustes internos de la tarjeta para pantallas pequeñas */
+    .event-card {
+        height: auto;
+    }
+
+    .card-footer {
+        flex-direction: column;
+        gap: 0.8rem;
+        align-items: stretch;
+    }
+
+    .footer-buttons {
+        justify-content: space-between;
+    }
+}

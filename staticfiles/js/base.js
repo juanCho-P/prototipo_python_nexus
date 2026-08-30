@@ -1,44 +1,71 @@
- // Toggle Sidebar
-        const sidebar = document.getElementById("sidebar");
-        document.getElementById("sidebarToggle").addEventListener("click", () => sidebar.classList.toggle("collapsed"));
-        document.getElementById("mobileMenu").addEventListener("click", () => sidebar.classList.toggle("mobile-open"));
 
-        // Modal Flotante de Notificaciones
-        const notifBtn = document.getElementById("notifBtn");
-        const notifPopover = document.getElementById("notifPopover");
+function getCookie(name) {
+    let cookieValue = null;
+    if (document.cookie && document.cookie !== '') {
+        const cookies = document.cookie.split(';');
+        for (let i = 0; i < cookies.length; i++) {
+            const cookie = cookies[i].trim();
+            if (cookie.substring(0, name.length + 1) === (name + '=')) {
+                cookieValue = decodeURIComponent(cookie.substring(name.length + 1));
+                break;
+            }
+        }
+    }
+    return cookieValue;
+}
 
-        notifBtn.addEventListener("click", (e) => {
-            e.stopPropagation();
-            notifPopover.classList.toggle("active");
-        });
+const csrftoken = getCookie('csrftoken');
 
-        document.addEventListener("click", (e) => {
-            if (!notifPopover.contains(e.target) && !notifBtn.contains(e.target)) {
-                notifPopover.classList.remove("active");
+// Toggle Sidebar
+const sidebar = document.getElementById("sidebar");
+const sidebarToggle = document.getElementById("sidebarToggle");
+const mobileMenu = document.getElementById("mobileMenu");
+
+if (sidebarToggle) {
+    sidebarToggle.addEventListener("click", () => sidebar.classList.toggle("collapsed"));
+}
+if (mobileMenu) {
+    mobileMenu.addEventListener("click", () => sidebar.classList.toggle("mobile-open"));
+}
+
+// Modal Flotante de Notificaciones
+const notifBtn = document.getElementById("notifBtn");
+const notifPopover = document.getElementById("notifPopover");
+
+if (notifBtn && notifPopover) {
+    notifBtn.addEventListener("click", (e) => {
+        e.stopPropagation();
+        notifPopover.classList.toggle("active");
+    });
+
+    document.addEventListener("click", (e) => {
+        if (!notifPopover.contains(e.target) && !notifBtn.contains(e.target)) {
+            notifPopover.classList.remove("active");
+        }
+    });
+}
+
+// Marcar Notificaciones como leídas AJAX
+const markAllBtn = document.getElementById("markAllReadBtn");
+if (markAllBtn) {
+    markAllBtn.addEventListener("click", () => {
+        fetch("/notification/marcar-todas/", { // Ajusta esta ruta si es diferente en tu urls.py
+            method: "POST",
+            headers: {
+                "X-CSRFToken": csrftoken,
+                "Content-Type": "application/json"
+            }
+        }).then(res => {
+            if (res.ok) {
+                const badge = document.getElementById("notifBadge");
+                if (badge) badge.remove();
+                document.querySelectorAll(".notif-item.unread").forEach(el => el.classList.remove("unread"));
             }
         });
+    });
+}
 
-        // Marcar Notificaciones como leídas AJAX
-        const markAllBtn = document.getElementById("markAllReadBtn");
-        if (markAllBtn) {
-            markAllBtn.addEventListener("click", () => {
-                fetch("{% url 'marcar_notificaciones_leidas' %}", {
-                    method: "POST",
-                    headers: {
-                        "X-CSRFToken": "{{ csrf_token }}",
-                        "Content-Type": "application/json"
-                    }
-                }).then(res => {
-                    if (res.ok) {
-                        const badge = document.getElementById("notifBadge");
-                        if (badge) badge.remove();
-                        document.querySelectorAll(".notif-item.unread").forEach(el => el.classList.remove("unread"));
-                    }
-                });
-            });
-        }
-
-        // Marcar individual como leída
+// Marcar individual como leída
 document.querySelectorAll(".mark-read").forEach(btn => {
     btn.addEventListener("click", (e) => {
         e.stopPropagation();
@@ -46,67 +73,59 @@ document.querySelectorAll(".mark-read").forEach(btn => {
         fetch(`/notification/marcar/${id}/`, {
             method: "POST",
             headers: { 
-                "X-CSRFToken": "{{ csrf_token }}",
+                "X-CSRFToken": csrftoken,
                 "X-Requested-With": "XMLHttpRequest"
             }
         }).then(res => {
             if (res.ok) {
                 const item = btn.closest(".notif-item");
-                item.classList.remove("unread");
+                if (item) item.classList.remove("unread");
                 btn.remove();
             }
         });
     });
 });
 
-    // Eliminar notificación individual
-    document.querySelectorAll(".delete-notif").forEach(btn => {
-        btn.addEventListener("click", (e) => {
-            e.stopPropagation();
-            const id = btn.dataset.id;
-            fetch(`/notification/eliminar/${id}/`, {
-                method: "POST",
-                headers: { 
-                    "X-CSRFToken": "{{ csrf_token }}",
-                    "X-Requested-With": "XMLHttpRequest"
-                }
-            }).then(res => {
-                if (res.ok) {
-                    btn.closest(".notif-item").remove();
-                }
-            });
-        });
-    });
-
-
-    document.querySelectorAll(".delete-notif").forEach(btn => {
+// Eliminar notificación individual
+document.querySelectorAll(".delete-notif").forEach(btn => {
     btn.addEventListener("click", (e) => {
         e.stopPropagation();
         const id = btn.dataset.id;
+        
         fetch(`/notification/eliminar/${id}/`, {
             method: "POST",
             headers: { 
-                "X-CSRFToken": "{{ csrf_token }}",
+                "X-CSRFToken": csrftoken,
                 "X-Requested-With": "XMLHttpRequest"
             }
-        })
-        .then(res => res.json())
-        .then(data => {
-            if (data.status === 'success') {
-                // Eliminar el elemento visualmente
-                btn.closest(".notif-item").remove();
+        }).then(async res => {
+            if (res.ok) {
+                let data = {};
+                try {
+                    data = await res.json();
+                } catch (err) {
+                    // Si la vista no devuelve JSON, se maneja de forma limpia
+                }
 
-                // Actualizar o remover el badge del contador
+                const item = btn.closest(".notif-item");
+                if (item) item.remove();
+
                 const badge = document.getElementById("notifBadge");
                 if (badge) {
-                    if (data.unread_count > 0) {
+                    if (data.unread_count !== undefined && data.unread_count > 0) {
                         badge.textContent = data.unread_count;
-                    } else {
+                    } else if (data.unread_count === 0) {
                         badge.remove();
+                    } else {
+                        let currentCount = parseInt(badge.textContent) - 1;
+                        if (currentCount > 0) {
+                            badge.textContent = currentCount;
+                        } else {
+                            badge.remove();
+                        }
                     }
                 }
 
-                // Si ya no quedan elementos, mostrar mensaje de vacío
                 const notifList = document.getElementById("notifList");
                 if (notifList && notifList.querySelectorAll(".notif-item").length === 0) {
                     notifList.innerHTML = '<div class="empty-notif">No tienes notificaciones.</div>';
