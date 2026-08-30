@@ -174,16 +174,15 @@ LOGOUT_REDIRECT_URL = 'login'
 # =========================================================
 # CONFIGURACIÓN DE CORREO SMTP CON GMAIL
 # =========================================================
+import os
+
 EMAIL_BACKEND = 'django.core.mail.backends.smtp.EmailBackend'
-EMAIL_HOST = 'smtp.gmail.com'
+EMAIL_HOST = 'smtp-relay.brevo.com'
 EMAIL_PORT = 587
+EMAIL_HOST_USER = os.environ.get('EMAIL_HOST_USER')
+EMAIL_HOST_PASSWORD = os.environ.get('EMAIL_HOST_PASSWORD')
 EMAIL_USE_TLS = True
-EMAIL_USE_SSL = False
-
-EMAIL_HOST_USER = os.environ.get('EMAIL_HOST_USER', 'equiponexus687@gmail.com')
-EMAIL_HOST_PASSWORD = os.environ.get('EMAIL_HOST_PASSWORD', 'door meaj vyku mlwg')
-
-DEFAULT_FROM_EMAIL = f"Nexus <{EMAIL_HOST_USER}>"
+DEFAULT_FROM_EMAIL = os.environ.get('DEFAULT_FROM_EMAIL')
 
 
 JAZZMIN_SETTINGS = {
