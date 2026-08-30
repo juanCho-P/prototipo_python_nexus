@@ -4,25 +4,30 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Nexus - Autenticación</title>
+    <!-- FontAwesome & Google Fonts -->
+    <link rel="shortcut icon" href="{% static 'img/logo.png' %}" type="image/png">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.2/css/all.min.css">
     <link rel="stylesheet" href="{% static 'auth.css' %}">
-    <title>Login Nexus</title>
 </head>
 <body>
 
-    <!-- Contenedor flotante para notificaciones -->
+    <!-- Contenedor flotante para notificaciones Toast -->
     <div id="toast-container" class="toast-container"></div>
 
     <div class="container" id="container">
 
-       
-       <!-- Formulario de Registro -->
+        <!-- Formulario de Registro -->
         <div class="form-container sign-up">
             <form id="form-register" action="{% url 'register' %}" method="POST" enctype="multipart/form-data">
                 {% csrf_token %}
                 <h1>Crear Cuenta</h1>
                 
+                <!-- Carga y Vista Previa de Avatar -->
                 <div class="file-upload-wrapper">
+                    <div class="avatar-preview-container">
+                        <img id="avatar-preview" src="{% static 'images/default-avatar.png' %}" alt="Foto de perfil" class="avatar-preview-img">
+                    </div>
                     <label for="avatar-input" class="file-upload-btn">
                         <i class="fa-solid fa-camera"></i>
                         <span id="file-label-text">Subir foto de perfil</span>
@@ -35,8 +40,7 @@
                 <input type="text" id="reg-username" name="username" placeholder="Nombre de usuario" required>
                 <input type="email" id="reg-email" name="email" placeholder="Correo electrónico" required>
 
-                
-                 <!-- Campo Contraseña con ojo -->
+                <!-- Campo Contraseña -->
                 <div class="password-field-wrapper">
                     <input type="password" id="reg-password" name="password" placeholder="Contraseña" required>
                     <i class="fa-solid fa-eye toggle-password" data-target="reg-password"></i>
@@ -44,15 +48,15 @@
 
                 <!-- Requisitos de la contraseña -->
                 <div class="password-requirements">
-                    <p class="req-title"><i class="fa-solid fa-shield-halved"></i> Tu contraseña debe cumplir:</p>
+                    <p class="req-title"><i class="fa-solid fa-shield-halved"></i> Requisitos de contraseña:</p>
                     <ul>
                         <li id="req-length" class="invalid"><i class="fa-solid fa-xmark"></i> Mínimo 8 caracteres</li>
                         <li id="req-number" class="invalid"><i class="fa-solid fa-xmark"></i> No ser solo números</li>
-                        <li id="req-user" class="invalid"><i class="fa-solid fa-xmark"></i> No contener tu nombre o correo</li>
+                        <li id="req-user" class="invalid"><i class="fa-solid fa-xmark"></i> Sin nombre ni correo</li>
                     </ul>
                 </div>
 
-                <!-- Campo Confirmar Contraseña con ojo -->
+                <!-- Confirmar Contraseña -->
                 <div class="password-field-wrapper">
                     <input type="password" id="reg-confirm-password" name="confirm_password" placeholder="Confirmar contraseña" required>
                     <i class="fa-solid fa-eye toggle-password" data-target="reg-confirm-password"></i>
@@ -62,6 +66,7 @@
                 <button type="submit">Registrarse</button>
             </form>
         </div>
+
         <!-- Formulario de Inicio de Sesión -->
         <div class="form-container sign-in">
             <form id="form-login" action="{% url 'login' %}" method="POST">
@@ -86,8 +91,8 @@
                     <button type="button" class="hidden" id="login">Iniciar sesión</button>
                 </div>
                 <div class="toggle-panel toggle-right">
-                    <h1>¡Hola, amigo!</h1>
-                    <p>Regístrate con tus datos personales para acceder a todas las funciones del sitio</p>
+                    <h1>¡Hola!</h1>
+                    <p>Regístrate con tus datos personales para unirte a la plataforma</p>
                     <button type="button" class="hidden" id="register">Registrarse</button>
                 </div>
             </div>
@@ -95,8 +100,6 @@
 
     </div>
 
-    <!-- Script de transiciones animación -->
-    <script src="{% static 'script.js' %}"></script>
-
+    <script src="{% static 'js/auth.js' %}"></script>
 </body>
 </html>

@@ -1,10 +1,8 @@
 from django.contrib import admin
-from .models import Usuario,Rol
+from .models import Usuario, Rol
 
-# Register your models here.
 @admin.register(Usuario)
 class UsuarioAdmin(admin.ModelAdmin):
-
     list_display = (
         'id_usuario',
         'username',
@@ -18,35 +16,25 @@ class UsuarioAdmin(admin.ModelAdmin):
         'is_active',
         'created_at',
     )
-
     list_filter = (
         'rol',
         'estado',
         'email_verificado',
         'is_active'
     )
-
     search_fields = (
         'username',
         'email',
-        'nombress',
+        'nombres', 
         'apellidos'
     )
-
     list_editable = (
         'email_verificado',
         'is_active',
         'strikes'
-        
-)
-
+    )
 
 @admin.register(Rol)
 class RolAdmin(admin.ModelAdmin):
-
-    list_display= (
-        'id_rol',
-    )
-
-    
-
+    list_display = ('id_rol', 'nombre')
+    search_fields = ('nombre',)

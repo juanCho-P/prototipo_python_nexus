@@ -12,37 +12,40 @@ def validar_reporte(reporte):
         autor_infractor = None
 
         
-        if hasattr(objeto, 'id_creador') and objeto.id_creador:
-            autor_infractor = objeto.id_creador
-        elif hasattr(objeto, 'id_usuario') and objeto.id_usuario:
-            autor_infractor = objeto.id_usuario
+# report/services.py
+from django.db import transaction
 
-        if autor_infractor:
-            
-            autor_infractor.strikes = getattr(autor_infractor, 'strikes', 0) + 1
-            
-           
-            if autor_infractor.strikes >= 3:
-                autor_infractor.is_active = False
+def validar_reporte(reporte):
+   
+    if reporte.estado == 'aprobado':
+        return False
 
-            autor_infractor.save()
-
-           
-            if hasattr(reporte, 'reportado'):
-                reporte.reportado = autor_infractor
-
-        reporte.estado = 'APROBADO'
+    with transaction.atomic():
+       
+        reporte.estado = 'aprobado'
         reporte.save()
 
-    return True
+        
+        usuario = reporte.reportado
+        if usuario:
+            usuario.strikes = getattr(usuario, 'strikes', 0) + 1
+            
+            if usuario.strikes >= 3:
+                usuario.is_active = False
+                
+            usuario.save()
+            return True
 
-def invalidar_reporte(reporte):
-    if reporte.estado == 'PENDIENTE':
-        reporte.estado = 'RECHAZADO'
-        reporte.save()
-        return True
     return False
 
+
+def invalidar_reporte(reporte):
+    if reporte.estado == 'rechazado':
+        return False
+        
+    reporte.estado = 'rechazado'
+    reporte.save()
+    return True
 
 
 

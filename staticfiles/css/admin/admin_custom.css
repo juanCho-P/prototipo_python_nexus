@@ -1,0 +1,97 @@
+/* static/css/admin/admin_custom.css */
+
+:root {
+    --color-primary: #9B44F2;
+    --color-secondary: #666DF2;
+    --color-blue: #5298F2;
+    --color-background: #F7F8FC;
+    --color-surface: #FFFFFF;
+    --color-text-primary: #262626;
+    --color-text-secondary: #5F6368;
+    --color-border: #E5E7EB;
+    --gradient-primary: linear-gradient(135deg, #9B44F2 0%, #666DF2 50%, #5298F2 100%);
+}
+
+/* =========================================================
+   1. SIDEBAR CON EL DEGRADADO OFICIAL DE NEXUS
+   ========================================================= */
+html body .wrapper aside.main-sidebar,
+html body .wrapper .main-sidebar,
+html body .sidebar-light-primary,
+html body .sidebar-dark-primary {
+    background: var(--gradient-primary) !important;
+    border-right: none !important;
+}
+
+/* Marca / Logotipo superior */
+html body .wrapper .brand-link {
+    background: transparent !important;
+    border-bottom: 1px solid rgba(255, 255, 255, 0.15) !important;
+}
+
+html body .wrapper .brand-link .brand-text,
+html body .wrapper .brand-link i {
+    color: #FFFFFF !important;
+    font-weight: 800 !important;
+}
+
+/* Texto e Íconos del Menú Lateral */
+html body .main-sidebar .sidebar a,
+html body .main-sidebar .nav-sidebar .nav-link,
+html body .main-sidebar .nav-sidebar .nav-link p,
+html body .main-sidebar .nav-sidebar .nav-link i,
+html body .main-sidebar .nav-header {
+    color: rgba(255, 255, 255, 0.9) !important;
+}
+
+/* Estado Activo y Hover en el Menú Lateral */
+html body .main-sidebar .nav-sidebar .nav-item .nav-link.active,
+html body .main-sidebar .nav-sidebar .nav-item .nav-link:hover {
+    background-color: rgba(255, 255, 255, 0.18) !important;
+    color: #FFFFFF !important;
+    border-radius: 8px !important;
+}
+
+/* =========================================================
+   2. CONTENEDOR PRINCIPAL, NAVBAR Y TARJETAS
+   ========================================================= */
+body, 
+.content-wrapper, 
+.main-footer {
+    background-color: var(--color-background) !important;
+}
+
+/* Barra Superior (TopBar) */
+.main-header.navbar {
+    background-color: var(--color-surface) !important;
+    border-bottom: 1px solid var(--color-border) !important;
+}
+
+.main-header .nav-link,
+.main-header .nav-link i {
+    color: var(--color-text-primary) !important;
+}
+
+/* Módulos y Tablas en formato Card */
+.card, 
+.small-box {
+    background-color: var(--color-surface) !important;
+    border: 1px solid var(--color-border) !important;
+    border-radius: 14px !important;
+    box-shadow: 0 8px 25px rgba(38, 38, 38, 0.05) !important;
+}
+
+.card-header, 
+.card-title {
+    color: var(--color-text-primary) !important;
+    font-weight: 700 !important;
+}
+
+/* Botones Principales en el Admin */
+.btn-primary, 
+.btn-success {
+    background: var(--gradient-primary) !important;
+    border: none !important;
+    border-radius: 8px !important;
+    box-shadow: 0 6px 18px rgba(102, 109, 242, 0.25) !important;
+}

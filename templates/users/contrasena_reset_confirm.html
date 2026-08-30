@@ -1,13 +1,82 @@
-<h1>Nueva contraseña</h1>
+{% load static %}
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.2/css/all.min.css">
+    <link rel="stylesheet" href="{% static 'auth.css' %}">
+    <title>Nueva Contraseña - Nexus</title>
+    <style>
+        .container {
+            min-height: 450px !important;
+            height: auto !important;
+            display: flex !important;
+            justify-content: center !important;
+            align-items: center !important;
+        }
+        .form-container.sign-in {
+            position: relative !important;
+            left: 0 !important;
+            width: 100% !important;
+            opacity: 1 !important;
+            z-index: 5 !important;
+            transform: none !important;
+            padding: 40px !important;
+        }
+        .form-container form {
+            display: flex !important;
+            flex-direction: column !important;
+            align-items: center !important;
+            justify-content: center !important;
+            width: 100% !important;
+        }
+    </style>
+</head>
+<body>
 
-<form method="post">
+    <div id="toast-container" class="toast-container"></div>
 
-    {% csrf_token %}
+    <div class="container active" id="container">
+        <div class="form-container sign-in">
+            <form method="POST">
+                {% csrf_token %}
+                <h1>Nueva Contraseña</h1>
+                <p style="font-size: 14px; color: #666; margin: 15px 0; text-align: center;">
+                    Ingresa tu nueva contraseña para actualizar tu cuenta.
+                </p>
 
-    {{ form.as_p }}
+                <!-- Mensajes de error de validación de Django -->
+                {% if form.errors %}
+                    <div style="color: #e74c3c; font-size: 13px; margin-bottom: 10px; text-align: center;">
+                        {% for field in form %}
+                            {% for error in field.errors %}
+                                <p>{{ error }}</p>
+                            {% endfor %}
+                        {% endfor %}
+                        {% for error in form.non_field_errors %}
+                            <p>{{ error }}</p>
+                        {% endfor %}
+                    </div>
+                {% endif %}
 
-    <button type="submit">
-        Cambiar contraseña
-    </button>
+                <!-- Nueva Contraseña -->
+                <div class="password-field-wrapper" style="width: 100%;">
+                    <input type="password" id="id_new_password1" name="new_password1" placeholder="Nueva contraseña" required>
+                    <i class="fa-solid fa-eye toggle-password" data-target="id_new_password1"></i>
+                </div>
 
-</form>
+                <!-- Confirmar Nueva Contraseña -->
+                <div class="password-field-wrapper" style="width: 100%; margin-top: 10px;">
+                    <input type="password" id="id_new_password2" name="new_password2" placeholder="Confirmar nueva contraseña" required>
+                    <i class="fa-solid fa-eye toggle-password" data-target="id_new_password2"></i>
+                </div>
+
+                <button type="submit" style="margin-top: 20px;">Guardar Contraseña</button>
+            </form>
+        </div>
+    </div>
+
+    <script src="{% static 'script.js' %}"></script>
+</body>
+</html>

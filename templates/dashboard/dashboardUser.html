@@ -1,60 +1,38 @@
 {% extends 'base.html' %}
+{% load static %}
 
-{% block title %}Dashboard{% endblock %}
+{% block title %}Dashboard | Nexus{% endblock %}
 
 {% block extra_css %}
-
-<style>
-    .alert-strike-card {
-    display: flex;
-    align-items: center;
-    gap: 15px;
-    padding: 16px 20px;
-    border-radius: 8px;
-    margin-bottom: 24px;
-}
-
-.alert-strike-card.warning {
-    background-color: #fff3cd;
-    border: 1px solid #ffe69c;
-    color: #664d03;
-}
-
-.alert-strike-card.danger {
-    background-color: #f8d7da;
-    border: 1px solid #f5c2c7;
-    color: #842029;
-}
-
-.alert-icon {
-    font-size: 1.5rem;
-}
-</style>
+<link rel="stylesheet" href="{% static 'dashboardUser.css' %}">
 {% endblock %}
 
 {% block content %}
 <div class="dashboard">
 
-    <!-- =========================
-         ENCABEZADO
-    ========================== -->
-    <div class="dashboard-header">
+    <!-- ENCABEZADO -->
+    <header class="dashboard-header">
         <div>
-            <h1>Bienvenido, {{ request.user.nombres }} 👋</h1>
-            <p>Aquí tienes un resumen de tu actividad en Nexus.</p>
+            <h1>
+                Bienvenido, {{ request.user.first_name|default:request.user.username }} 👋
+            </h1>
+            <p> Aquí tienes un resumen actualizado de tu actividad en Nexus.</p>
         </div>
-    </div>
+    </header>
 
-    <!-- =========================
-         ALERTA DE STRIKES Y ESTADO DE CUENTA
-    ========================== -->
+    <!-- ALERTA DE STRIKES -->
     {% if strikes_count > 0 %}
         <div class="alert-strike-card {% if strikes_count >= 3 %}danger{% else %}warning{% endif %}">
-            <div class="alert-icon">
+            <div class="alert-icon" aria-hidden="true">
                 <i class="fa-solid fa-triangle-exclamation"></i>
             </div>
+
             <div class="alert-content">
-                <h3>Estado de la cuenta: {{ strikes_count }} {% if strikes_count == 1 %}strike{% else %}strikes{% endif %}</h3>
+                <h3>
+                    Estado de la cuenta: {{ strikes_count }}
+                    {% if strikes_count == 1 %}strike{% else %}strikes{% endif %}
+                </h3>
+
                 <p>
                     {% if strikes_count >= 3 %}
                         Has alcanzado el límite de advertencias. Tu cuenta está bajo revisión de moderación.
@@ -66,14 +44,27 @@
         </div>
     {% endif %}
 
-    <!-- =========================
-         ESTADÍSTICAS GENERALES
-    ========================== -->
-    <div class="stats-grid">
+    <!-- EVENTO MÁS PRÓXIMO -->
+    {% if evento_proximo %}
+        <section class="upcoming-event-card" aria-label="Próximo evento">
+            <div class="upcoming-event-header">
+                <i class="fa-solid fa-bell" aria-hidden="true"></i>
+                <span>Tu próximo evento</span>
+            </div>
 
-        <!-- EVENTOS -->
+            <p class="upcoming-event-title">{{ evento_proximo.titulo }}</p>
+
+            <p class="upcoming-event-date">
+                <i class="fa-regular fa-calendar-days" aria-hidden="true"></i>
+                {{ evento_proximo.f_inicio|date:"d \d\e F, Y - H:i" }} hrs
+            </p>
+        </section>
+    {% endif %}
+
+    <!-- ESTADÍSTICAS -->
+    <section class="stats-grid" aria-label="Estadísticas generales">
         <div class="stat-card">
-            <div class="stat-icon purple">
+            <div class="stat-icon purple" aria-hidden="true">
                 <i class="fa-solid fa-calendar-days"></i>
             </div>
             <div class="stat-info">
@@ -82,9 +73,8 @@
             </div>
         </div>
 
-        <!-- FOROS -->
         <div class="stat-card">
-            <div class="stat-icon blue">
+            <div class="stat-icon blue" aria-hidden="true">
                 <i class="fa-solid fa-comments"></i>
             </div>
             <div class="stat-info">
@@ -93,9 +83,8 @@
             </div>
         </div>
 
-        <!-- ASISTENTES TOTALES -->
         <div class="stat-card">
-            <div class="stat-icon cyan">
+            <div class="stat-icon cyan" aria-hidden="true">
                 <i class="fa-solid fa-users"></i>
             </div>
             <div class="stat-info">
@@ -104,40 +93,132 @@
             </div>
         </div>
 
-        <!-- EVENTO MÁS POPULAR -->
         <div class="stat-card">
-            <div class="stat-icon green">
+            <div class="stat-icon green" aria-hidden="true">
                 <i class="fa-solid fa-fire"></i>
             </div>
             <div class="stat-info">
                 <span class="stat-number">
-                    {% if evento_top %}{{ evento_top.asistentes.count }}{% else %}0{% endif %}
+                    {% if evento_top %}
+                        {{ evento_top.asistentes.count }}
+                    {% else %}
+                        0
+                    {% endif %}
                 </span>
+
                 <span class="stat-label">
-                    {% if evento_top %}Top: {{ evento_top.titulo|truncatechars:15 }}{% else %}Sin eventos tops{% endif %}
+                    {% if evento_top %}
+                        Top: {{ evento_top.titulo|truncatechars:15 }}
+                    {% else %}
+                        Sin eventos tops
+                    {% endif %}
                 </span>
             </div>
         </div>
+    </section>
 
-    </div>
-
-    <!-- =========================
-         MIS EVENTOS Y MÉTRICAS
-    ========================== -->
+    <!-- EVENTOS A LOS QUE SE UNIÓ -->
     <section class="dashboard-section">
         <div class="section-header">
             <div>
-                <h2>Mis eventos</h2>
+                <h2>Eventos a los que me he unido</h2>
+                <p>Lista de eventos en los que estás inscrito como asistente.</p>
+            </div>
+        </div>
+
+        {% if eventos_usuario %}
+            <div class="event-table event-table--joined">
+                <div class="table-header" aria-hidden="true">
+                    <span>Título</span>
+                    <span>Fecha</span>
+                    <span>Ubicación</span>
+                    <span>Estado</span>
+                    <span>Acciones</span>
+                </div>
+
+                {% for evento in eventos_usuario %}
+                    <div class="table-row">
+                        <span class="event-title" data-label="Título">
+                            <a href="{% url 'evento_detalle' evento.pk %}">
+                                {{ evento.titulo }}
+                            </a>
+                        </span>
+
+                        <span data-label="Fecha">
+                            {{ evento.f_inicio|date:"d/m/Y H:i" }}
+                        </span>
+
+                        <span data-label="Ubicación">
+                            {{ evento.ubicacion }}
+                        </span>
+
+                        <span data-label="Estado">
+                            <span class="status-badge status-{{ evento.estado|lower }}">
+                                {{ evento.estado }}
+                            </span>
+                        </span>
+
+                        <span class="table-actions" data-label="Acciones">
+                            <a
+                                href="{% url 'evento_detalle' evento.pk %}"
+                                class="btn-icon"
+                                title="Ver detalle"
+                                aria-label="Ver detalle de {{ evento.titulo }}"
+                            >
+                                <i class="fa-solid fa-eye" aria-hidden="true"></i>
+                            </a>
+
+                            <form
+                                action="{% url 'cancelar_asistencia' evento.pk %}"
+                                method="POST"
+                            >
+                                {% csrf_token %}
+
+                                <button
+                                    type="submit"
+                                    class="btn-danger-outline"
+                                    title="Cancelar asistencia"
+                                    aria-label="Cancelar asistencia a {{ evento.titulo }}"
+                                    onclick="return confirm('¿Confirmas que deseas cancelar tu asistencia a este evento?');"
+                                >
+                                    <i class="fa-solid fa-user-minus" aria-hidden="true"></i>
+                                </button>
+                            </form>
+                        </span>
+                    </div>
+                {% endfor %}
+            </div>
+        {% else %}
+            <div class="empty-state">
+                <i class="fa-regular fa-calendar-check" aria-hidden="true"></i>
+                <h3>No estás registrado en ningún evento</h3>
+                <p>
+                    Explora los eventos disponibles e inscríbete a los que sean de tu interés.
+                </p>
+                <a href="{% url 'buscar_eventos' %}" class="primary-button">
+                    Explorar eventos
+                </a>
+            </div>
+        {% endif %}
+    </section>
+
+    <!-- MIS EVENTOS CREADOS -->
+    <section class="dashboard-section">
+        <div class="section-header">
+            <div>
+                <h2>Mis eventos creados</h2>
                 <p>Monitorea la asistencia y el estado de tus eventos.</p>
             </div>
+
             <a href="{% url 'crear_evento' %}" class="primary-button">
-                <i class="fa-solid fa-plus"></i> Crear evento
+                <i class="fa-solid fa-plus" aria-hidden="true"></i>
+                Crear evento
             </a>
         </div>
 
         {% if eventos %}
-            <div class="event-table">
-                <div class="table-header">
+            <div class="event-table event-table--created">
+                <div class="table-header" aria-hidden="true">
                     <span>Título</span>
                     <span>Fecha</span>
                     <span>Ubicación</span>
@@ -148,22 +229,39 @@
 
                 {% for evento in eventos %}
                     <div class="table-row">
-                        <span class="event-title">
-                            <a href="{% url 'evento_detalle' evento.pk %}">{{ evento.titulo }}</a>
+                        <span class="event-title" data-label="Título">
+                            <a href="{% url 'evento_detalle' evento.pk %}">
+                                {{ evento.titulo }}
+                            </a>
                         </span>
-                        <span>{{ evento.f_inicio|date:"d/m/Y H:i" }}</span>
-                        <span>{{ evento.ubicacion }}</span>
-                        <span>
+
+                        <span data-label="Fecha">
+                            {{ evento.f_inicio|date:"d/m/Y H:i" }}
+                        </span>
+
+                        <span data-label="Ubicación">
+                            {{ evento.ubicacion }}
+                        </span>
+
+                        <span data-label="Estado">
                             <span class="status-badge status-{{ evento.estado|lower }}">
                                 {{ evento.estado }}
                             </span>
                         </span>
-                        <span>
-                            <i class="fa-solid fa-user-group"></i> {{ evento.asistentes.count }}
+
+                        <span data-label="Asistentes">
+                            <i class="fa-solid fa-user-group" aria-hidden="true"></i>
+                            {{ evento.asistentes.count }}
                         </span>
-                        <span>
-                            <a href="{% url 'evento_detalle' evento.pk %}" class="btn-icon" title="Ver detalle">
-                                <i class="fa-solid fa-eye"></i>
+
+                        <span class="table-actions" data-label="Acciones">
+                            <a
+                                href="{% url 'evento_detalle' evento.pk %}"
+                                class="btn-icon"
+                                title="Ver detalle"
+                                aria-label="Ver detalle de {{ evento.titulo }}"
+                            >
+                                <i class="fa-solid fa-eye" aria-hidden="true"></i>
                             </a>
                         </span>
                     </div>
@@ -171,25 +269,29 @@
             </div>
         {% else %}
             <div class="empty-state">
-                <i class="fa-regular fa-calendar"></i>
+                <i class="fa-regular fa-calendar" aria-hidden="true"></i>
                 <h3>Todavía no tienes eventos</h3>
-                <p>Crea tu primer evento y comienza a conectar con otras personas.</p>
-                <a href="{% url 'crear_evento' %}" class="primary-button">Crear mi primer evento</a>
+                <p>
+                    Crea tu primer evento y comienza a conectar con otras personas.
+                </p>
+                <a href="{% url 'crear_evento' %}" class="primary-button">
+                    Crear mi primer evento
+                </a>
             </div>
         {% endif %}
     </section>
 
-    <!-- =========================
-         MIS FOROS
-    ========================== -->
+    <!-- MIS FOROS -->
     <section class="dashboard-section">
         <div class="section-header">
             <div>
                 <h2>Mis foros</h2>
                 <p>Comunidades que has creado.</p>
             </div>
+
             <a href="{% url 'crear_foro' %}" class="primary-button">
-                <i class="fa-solid fa-plus"></i> Crear foro
+                <i class="fa-solid fa-plus" aria-hidden="true"></i>
+                Crear foro
             </a>
         </div>
 
@@ -197,28 +299,32 @@
             <div class="forum-grid">
                 {% for foro in foros %}
                     <article class="forum-card">
-                        <div class="forum-card-icon">
+                        <div class="forum-card-icon" aria-hidden="true">
                             <i class="fa-solid fa-comments"></i>
                         </div>
+
                         <h3>{{ foro.titulo }}</h3>
+
                         <p>{{ foro.descripcion|truncatechars:100 }}</p>
+
                         <a href="{% url 'foro_detalle' foro.id %}" class="card-link">
-                            Ver foro <i class="fa-solid fa-arrow-right"></i>
+                            Ver foro
+                            <i class="fa-solid fa-arrow-right" aria-hidden="true"></i>
                         </a>
                     </article>
                 {% endfor %}
             </div>
         {% else %}
             <div class="empty-state">
-                <i class="fa-regular fa-comments"></i>
+                <i class="fa-regular fa-comments" aria-hidden="true"></i>
                 <h3>Todavía no tienes foros</h3>
                 <p>Crea un foro para comenzar una comunidad.</p>
-                <a href="{% url 'crear_foro' %}" class="primary-button">Crear mi primer foro</a>
+                <a href="{% url 'crear_foro' %}" class="primary-button">
+                    Crear mi primer foro
+                </a>
             </div>
         {% endif %}
     </section>
 
 </div>
-
-
 {% endblock %}

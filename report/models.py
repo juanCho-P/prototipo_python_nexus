@@ -29,9 +29,8 @@ class Reporte(models.Model):
         on_delete=models.CASCADE, 
         related_name='reportes_recibidos',
         null=True,
-        blank= True
+        blank=True
     )
-
 
     motivo = models.CharField(max_length=50, choices=MOTIVOS_CHOICES)
     comentario = models.TextField(blank=True, null=True)
@@ -40,9 +39,12 @@ class Reporte(models.Model):
     object_id = models.PositiveIntegerField()
     contenido_objeto = GenericForeignKey('content_type', 'object_id')
 
-    motivo = models.TextField()
     estado = models.CharField(max_length=20, choices=ESTADOS, default='pendiente')
     created_at = models.DateTimeField(auto_now_add=True)
 
     def __str__(self):
-        return f"Reporte a {self.reportado.username} [{self.content_type.model}]"
+        # Manejo seguro para evitar 'NoneType' object has no attribute 'username'
+        usuario_reportado = self.reportado.username if self.reportado else "Usuario eliminado"
+        tipo_contenido = self.content_type.model if self.content_type else "Objeto"
+        
+        return f"Reporte a {usuario_reportado} [{tipo_contenido}]"

@@ -1,0 +1,166 @@
+/* ==========================================================================
+   Estilos Independientes para Páginas de Error (404, 500, 403)
+   ========================================================================== */
+
+/* Importar tipografía moderna */
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap');
+
+:root {
+    --err-bg: #F8FAFC;
+    --err-surface: #FFFFFF;
+    --err-text-primary: #0F172A;
+    --err-text-secondary: #64748B;
+    --err-border: #E2E8F0;
+    --err-radius: 20px;
+    --err-shadow: 0 20px 25px -5px rgba(15, 23, 42, 0.08), 0 8px 10px -6px rgba(15, 23, 42, 0.04);
+    
+    /* Gradiente Principal (404 / General - Púrpura y Azul) */
+    --err-grad-primary: linear-gradient(135deg, #8B5CF6 0%, #6366F1 50%, #3B82F6 100%);
+    --err-btn-bg: #6366F1;
+    --err-btn-hover: #4F46E5;
+
+    /* Gradiente para Error 500 (Rojo y Naranja) */
+    --err-grad-500: linear-gradient(135deg, #EF4444 0%, #F97316 100%);
+    --err-btn-500-bg: #EF4444;
+    --err-btn-500-hover: #DC2626;
+}
+
+/* Reset básico */
+* {
+    box-sizing: border-box;
+    margin: 0;
+    padding: 0;
+}
+
+body {
+    background-color: #0F172A;
+}
+
+/* Estructura del Contenedor */
+.error-container {
+    width: 100%;
+    padding: 24px;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+
+.error-card {
+    max-width: 480px;
+    width: 100%;
+    padding: 48px 36px;
+    text-align: center;
+    background: var(--err-surface);
+    border: 1px solid var(--err-border);
+    border-radius: var(--err-radius);
+    box-shadow: var(--err-shadow);
+    position: relative;
+    overflow: hidden;
+    animation: errorSlideUp 0.4s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+/* Barra superior con gradiente decorativo */
+.error-card::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    height: 6px;
+    background: var(--err-grad-primary);
+}
+
+/* Número del código de error */
+.error-code {
+    font-size: 96px;
+    font-weight: 800;
+    line-height: 1;
+    margin-bottom: 12px;
+    background: var(--err-grad-primary);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    letter-spacing: -3px;
+}
+
+/* Textos */
+.error-title {
+    font-size: 22px;
+    font-weight: 700;
+    color: var(--err-text-primary);
+    margin-bottom: 12px;
+    letter-spacing: -0.5px;
+}
+
+.error-description {
+    font-size: 15px;
+    color: var(--err-text-secondary);
+    line-height: 1.6;
+    margin-bottom: 32px;
+}
+
+/* Botón estilizado */
+.error-actions {
+    display: flex;
+    justify-content: center;
+}
+
+.error-btn {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    padding: 12px 28px;
+    font-size: 14px;
+    font-weight: 600;
+    color: #FFFFFF;
+    background-color: var(--err-btn-bg);
+    border: none;
+    border-radius: 10px;
+    text-decoration: none;
+    transition: background-color 0.2s ease, transform 0.1s ease;
+    cursor: pointer;
+    box-shadow: 0 4px 12px rgba(99, 102, 241, 0.25);
+}
+
+.error-btn:hover {
+    background-color: var(--err-btn-hover);
+    transform: translateY(-1px);
+}
+
+.error-btn:active {
+    transform: translateY(0);
+}
+
+/* ==========================================================================
+   Variante: ERROR 500
+   ========================================================================== */
+
+.error-card.error-500::before {
+    background: var(--err-grad-500);
+}
+
+.error-card.error-500 .error-code {
+    background: var(--err-grad-500);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+}
+
+.error-card.error-500 .error-btn {
+    background-color: var(--err-btn-500-bg);
+    box-shadow: 0 4px 12px rgba(239, 68, 68, 0.25);
+}
+
+.error-card.error-500 .error-btn:hover {
+    background-color: var(--err-btn-500-hover);
+}
+
+/* Animación de entrada */
+@keyframes errorSlideUp {
+    from {
+        opacity: 0;
+        transform: translateY(20px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}

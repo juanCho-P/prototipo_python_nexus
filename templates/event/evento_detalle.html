@@ -114,17 +114,17 @@
             </div>
         </div>
 
-        <!-- FOOTER DE ACCIONES -->
+        <!-- FOOTER DE ACCIONES EN EVENTO_DETALLE.HTML -->
         <footer class="detail-footer">
             {% if request.user.is_authenticated and not es_creador %}
                 
                 {% if ya_reporto %}
-                    <span class="text-disabled-action" style="color: #94a3b8; font-size: 0.9rem;">
-                        <i class="fa-solid fa-clock-rotate-left"></i> Reporte enviado
-                    </span>
+                    <button type="button" class="btn-join-forum" style="background: #64748b; color: #fff; cursor: not-allowed;" disabled title="Ya has reportado este evento">
+                        <i class="fa-solid fa-circle-check"></i> Reportado
+                    </button>
                 {% else %}
-                    <button type="button" class="btn-report" onclick="openReportModal('{{ evento.pk }}')">
-                        <i class="fa-solid fa-triangle-exclamation"></i> Reportar Evento
+                    <button type="button" class="btn-join-forum" style="background: #ef4444; color: #fff;" onclick="openReportModal('{{ evento.pk }}')">
+                        <i class="fa-solid fa-flag"></i> Reportar
                     </button>
                 {% endif %}
 

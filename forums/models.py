@@ -8,7 +8,6 @@ from report.models import Reporte
 class Foro(models.Model): 
     ESTADOS = [
         ('PUBLICADO', 'Publicado'),
-        ('BORRADOR', 'Borrador'),
         ('OCULTO', 'Oculto por moderación'),
         ('ELIMINADO', 'Eliminado por el creador'),
         ('ELIMINADO_ADMIN', 'Eliminado por un administrador'),
@@ -28,8 +27,6 @@ class Foro(models.Model):
     )
 
     estado = models.CharField(max_length=20, choices=ESTADOS, default='PUBLICADO')
-
-    # Relación genérica para reportes
     reportes = GenericRelation(Reporte)
 
     def __str__(self):
@@ -57,8 +54,6 @@ class Comentario(models.Model):
     )
 
     activo = models.BooleanField(default=True) 
-
-
     reportes = GenericRelation(Reporte)
 
     def __str__(self):

@@ -31,13 +31,13 @@ SECRET_KEY = 'django-insecure-53@d##$rcl$=!-x**lf041(+r6uhkoi#$ah9ol_0dbnx9&8vsm
 
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
-
 ALLOWED_HOSTS = ['*']
 
 
 # Application definition
 
 INSTALLED_APPS = [
+    'jazzmin',
     'django.contrib.admin',
     'django.contrib.auth',
     'django.contrib.contenttypes',
@@ -62,8 +62,9 @@ MIDDLEWARE = [
     'django.contrib.auth.middleware.AuthenticationMiddleware',
     'django.contrib.messages.middleware.MessageMiddleware',
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
+     'users.middleware.InactivityTimeoutMiddleware',
 ]
-
+INACTIVITY_TIMEOUT = 900
 ROOT_URLCONF = 'config.urls'
 
 TEMPLATES = [
@@ -76,6 +77,7 @@ TEMPLATES = [
                 'django.template.context_processors.request',
                 'django.contrib.auth.context_processors.auth',
                 'django.contrib.messages.context_processors.messages',
+                'notification.context_processors.notificaciones_usuario',
             ],
         },
     },
@@ -130,7 +132,7 @@ AUTH_PASSWORD_VALIDATORS = [
 
 LANGUAGE_CODE = 'es-co'                  # Configurado para español de Colombia
 
-
+ALLOWED_HOSTS = ['localhost', '127.0.0.1', '*']
 
 TIME_ZONE = 'America/Bogota'             # Configurado para tu zona horaria local
 
@@ -150,9 +152,11 @@ AUTH_USER_MODEL = 'users.Usuario'        # Modelo personalizado de usuario
 
 
 STATIC_URL = 'static/'
-STATICFILES_DIRS = [                     # Configuración de carpeta estática global
-    BASE_DIR / 'static',        
+STATICFILES_DIRS = [
+    BASE_DIR / 'static',
 ]
+
+STATIC_ROOT = BASE_DIR / 'staticfiles'
 
 
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
@@ -161,8 +165,71 @@ CSRF_TRUSTED_ORIGINS = [
     'https://thermos-obsessed-shortage.ngrok-free.dev',
 ]
 
-EMAIL_BACKEND = 'django.core.mail.backends.filebased.EmailBackend'
-EMAIL_FILE_PATH = BASE_DIR / 'sent_emails' # Configuración para enviar correos electrónicos a la consola durante el desarrollo
-DEFAULT_FROM_EMAIL = 'noreply@nexus.com'
+
+
+
 
 LOGOUT_REDIRECT_URL = 'login'
+
+
+# =========================================================
+# CONFIGURACIÓN DE CORREO SMTP CON GMAIL
+# =========================================================
+EMAIL_BACKEND = 'django.core.mail.backends.smtp.EmailBackend'
+EMAIL_HOST = 'smtp.gmail.com'
+EMAIL_PORT = 587
+EMAIL_USE_TLS = True
+EMAIL_USE_SSL = False
+
+# Credenciales optimizadas para desarrollo y producción
+EMAIL_HOST_USER = os.environ.get('EMAIL_HOST_USER', 'equiponexus687@gmail.com')
+EMAIL_HOST_PASSWORD = os.environ.get('EMAIL_HOST_PASSWORD', 'door meaj vyku mlwg')
+
+DEFAULT_FROM_EMAIL = f"Nexus <{EMAIL_HOST_USER}>"
+
+
+JAZZMIN_SETTINGS = {
+    "site_title": "Nexus Admin",
+    "site_header": "Nexus",
+    "site_brand": "Plataforma Nexus",
+    "welcome_sign": "Bienvenido al Panel de Administración",
+    "search_model": "users.Usuario",
+    
+    
+    "site_icon": "img/favicon.png",
+   
+    "site_logo": "img/logo.png",
+    "site_logo_classes": "img-circle",
+    
+    "topmenu_links": [
+        {"name": "Inicio", "url": "admin:index"},
+        {"name": "Ver Sitio", "url": "/"},
+    ],
+    "show_sidebar": True,
+    "navigation_expanded": True,
+    "theme": "default",  
+    "custom_css": "css/admin/admin_custom.css",
+    "show_ui_builder": False,
+}
+
+JAZZMIN_UI_TWEAKS = {
+    "theme": "default",
+    "navbar": "navbar-white navbar-light", 
+    "sidebar": "sidebar-light-primary",
+    "sidebar_nav_small_text": False,
+    "sidebar_disable_expand": False,
+    "sidebar_nav_child_indent": False,
+    "sidebar_nav_compact_style": False,
+    "sidebar_nav_legacy_style": False,
+    "sidebar_nav_flat_style": False,
+    "brand_colour": False,
+    "button_classes": {
+        "primary": "btn-primary",
+        "secondary": "btn-secondary",
+        "info": "btn-info",
+        "warning": "btn-warning",
+        "danger": "btn-danger",
+        "success": "btn-primary"
+    }
+}
+

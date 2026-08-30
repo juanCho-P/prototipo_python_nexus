@@ -1,7 +1,7 @@
 {% extends 'base.html' %}
 {% load static %}
 
-{% block title %}{{ foro.titulo }} - Nexus{% endblock %}
+{% block title %}{{ foro.titulo }} - Detalles del Foro{% endblock %}
 
 {% block extra_css %}
 <link rel="stylesheet" href="{% static 'buscar_foro.css' %}">
@@ -40,6 +40,7 @@
         <!-- Acciones del Foro -->
         {% if foro.estado != 'ELIMINADO' %}
             <div style="display: flex; gap: 0.8rem; flex-wrap: wrap;">
+                <!-- Guardar / Quitar de guardados -->
                 <a href="{% url 'guardar_foro_toggle' foro.id %}" class="btn-join-forum" style="border: 1px solid var(--color-border);">
                     {% if es_guardado %}
                         <i class="fa-solid fa-bookmark" style="color: var(--color-primary);"></i> Guardado
@@ -48,47 +49,60 @@
                     {% endif %}
                 </a>
 
+                <!-- Reportar Foro (Solo si el usuario autenticado no es el creador) -->
                 {% if request.user.is_authenticated and request.user != foro.id_creador %}
-                    <button type="button" class="btn-join-forum" style="background: #ef4444; color: #fff;" onclick="openReportModal('foro', '{{ foro.id }}')">
-                        <i class="fa-solid fa-flag"></i> Reportar
-                    </button>
+                    {% if ya_reporto_foro %}
+                        <button type="button" class="btn-join-forum" style="background: #64748b; color: #fff; cursor: not-allowed;" disabled title="Ya has reportado este foro">
+                            <i class="fa-solid fa-circle-check"></i> Reportado
+                        </button>
+                    {% else %}
+                        <button type="button" class="btn-join-forum" style="background: #ef4444; color: #fff;" onclick="openReportModal('foro', '{{ foro.id }}')">
+                            <i class="fa-solid fa-flag"></i> Reportar
+                        </button>
+                    {% endif %}
                 {% endif %}
 
-                {% if foro.estado == 'ACTIVO' and request.user == foro.id_creador %}
+                <!-- OPCIONES EXCLUSIVAS DEL CREADOR DE FORO -->
+                {% if request.user == foro.id_creador %}
+                    <!-- Botón para Editar Foro -->
+                    <a href="{% url 'editar_foro' foro.id %}" class="btn-join-forum" style="background: #3b82f6; color: #fff;">
+                        <i class="fa-solid fa-pen-to-square"></i> Editar
+                    </a>
+
+                    <!-- Botón para Desactivar Foro -->
                     <form action="{% url 'eliminar_foro' foro.id %}" method="POST" style="display: inline;">
                         {% csrf_token %}
-                        <button type="submit" class="btn-join-forum" style="background: #dc2626; color: #fff;">
+                        <button type="submit" class="btn-join-forum" style="background: #dc2626; color: #fff;" onclick="return confirm('¿Seguro que deseas desactivar este foro?');">
                             <i class="fa-solid fa-trash"></i> Desactivar
                         </button>
                     </form>
-                {% elif foro.estado == 'ELIMINADO' and request.user == foro.id_creador %}
-                    <form action="{% url 'reactivar_foro' foro.id %}" method="POST" style="display: inline;">
-                        {% csrf_token %}
-                        <button type="submit" class="btn-join-forum" style="background: #10b981; color: #fff;">
-                            <i class="fa-solid fa-arrows-rotate"></i> Volver a activar
-                        </button>
-                    </form>
-                {% elif foro.estado == 'DESACTIVADO_ADMIN' %}
-                    <span class="category-badge" style="background: #ef4444; color: #fff;">
-                        <i class="fa-solid fa-ban"></i> Sancionado por Administración
-                    </span>
                 {% endif %}
             </div>
+        {% else %}
+            {% if request.user == foro.id_creador %}
+                <form action="{% url 'reactivar_foro' foro.id %}" method="POST" style="display: inline;">
+                    {% csrf_token %}
+                    <button type="submit" class="btn-join-forum" style="background: #10b981; color: #fff;">
+                        <i class="fa-solid fa-arrows-rotate"></i> Volver a activar
+                    </button>
+                </form>
+            {% endif %}
         {% endif %}
     </div>
 
     <!-- Sección de Comentarios -->
-    <div class="comments-section">
+    <div class="comments-section" style="margin-top: 2rem;">
         <h3 class="search-title" style="text-align: left; font-size: 1.4rem; margin-bottom: 1.5rem;">
             Comentarios ({{ publicaciones.count }})
         </h3>
 
         {% if foro.estado == 'ELIMINADO' %}
             <div style="background: rgba(239, 68, 68, 0.1); border: 1px solid #ef4444; color: #fca5a5; padding: 1rem; border-radius: var(--radius-medium); text-align: center; margin-bottom: 2rem;">
-                <i class="fa-solid fa-lock me-2"></i> Este foro ha sido desactivado y no acepta nuevas respuestas.
+                <i class="fa-solid fa-lock me-2"></i> Este foro está desactivado y no acepta nuevas respuestas.
             </div>
         {% else %}
-            <form method="POST" action="" enctype="multipart/form-data" style="margin-bottom: 2.5rem;">
+            <!-- Formulario Principal de Comentarios -->
+            <form method="POST" action="{% url 'foro_detalle' foro.id %}" enctype="multipart/form-data" style="margin-bottom: 2.5rem;">
                 {% csrf_token %}
                 <textarea name="contenido" rows="3" class="search-input" style="border-radius: var(--radius-medium); padding: 1rem; resize: vertical;" placeholder="Añade un comentario..." required></textarea>
                 
@@ -104,13 +118,13 @@
             </form>
         {% endif %}
 
-        <!-- Lista de Comentarios -->
+        <!-- Listado de Comentarios Raíz -->
         {% for pub in publicaciones %}
-            <div class="comment-box">
+            <div class="comment-box" style="margin-bottom: 1.5rem;">
                 <div class="comment-avatar">
                     {{ pub.id_usuario.username|slice:":1"|upper|default:"U" }}
                 </div>
-                <div class="comment-content-wrapper">
+                <div class="comment-content-wrapper" style="width: 100%;">
                     <div class="comment-header">
                         <span class="comment-author">{{ pub.id_usuario.username|default:"Usuario" }}</span>
                         <span class="comment-date">{{ pub.created_at|date:"d/m/Y H:i" }}</span>
@@ -121,21 +135,29 @@
                     {% endif %}
 
                     {% if pub.imagen %}
-                        <img src="{{ pub.imagen.url }}" alt="Imagen adjunta" class="comment-img-attached">
+                        <img src="{{ pub.imagen.url }}" alt="Imagen adjunta" class="comment-img-attached" style="max-width: 300px; border-radius: 8px; margin-top: 0.5rem;">
                     {% endif %}
 
                     {% if foro.estado != 'ELIMINADO' %}
-                        <div class="comment-actions">
+                        <div class="comment-actions" style="margin-top: 0.5rem; display: flex; gap: 1rem;">
                             <button type="button" class="btn-action-link" onclick="toggleReplyForm('{{ pub.id }}')">
                                 <i class="fa-solid fa-reply"></i> Responder
                             </button>
 
+                            <!-- Reportar Comentario -->
                             {% if request.user.is_authenticated and request.user != pub.id_usuario %}
-                                <button type="button" class="btn-action-link danger" onclick="openReportModal('comentario', '{{ pub.id }}')">
-                                    <i class="fa-solid fa-flag"></i> Reportar
-                                </button>
+                                {% if pub.id in comentarios_reportados_ids %}
+                                    <span class="btn-action-link" style="color: #64748b; cursor: not-allowed;" title="Ya has reportado este comentario">
+                                        <i class="fa-solid fa-circle-check"></i> Reportado
+                                    </span>
+                                {% else %}
+                                    <button type="button" class="btn-action-link danger" onclick="openReportModal('comentario', '{{ pub.id }}')">
+                                        <i class="fa-solid fa-flag"></i> Reportar
+                                    </button>
+                                {% endif %}
                             {% endif %}
 
+                            <!-- Desactivar/Eliminar Comentario (Creador o Dueño del Comentario) -->
                             {% if request.user == foro.id_creador or request.user == pub.id_usuario %}
                                 <a href="{% url 'eliminar_comentario' pub.id %}" class="btn-action-link danger" onclick="return confirm('¿Desactivar este comentario?');">
                                     <i class="fa-solid fa-eye-slash"></i> Desactivar
@@ -143,8 +165,8 @@
                             {% endif %}
                         </div>
 
-                        <!-- Formulario Oculto de Respuesta -->
-                        <form id="reply-form-{{ pub.id }}" method="POST" action="" enctype="multipart/form-data" style="display: none; margin-top: 1rem;">
+                        <!-- Formulario de Respuesta a Comentario -->
+                        <form id="reply-form-{{ pub.id }}" method="POST" action="{% url 'foro_detalle' foro.id %}" enctype="multipart/form-data" style="display: none; margin-top: 1rem;">
                             {% csrf_token %}
                             <input type="hidden" name="comentario_padre" value="{{ pub.id }}">
                             <textarea name="contenido" rows="2" class="search-input" style="border-radius: var(--radius-medium); padding: 0.8rem;" placeholder="Escribe tu respuesta..." required></textarea>
@@ -164,11 +186,11 @@
             <!-- Respuestas Anidadas -->
             {% for sub in pub.respuestas.all %}
                 {% if sub.activo %}
-                    <div class="comment-box reply-container">
+                    <div class="comment-box reply-container" style="margin-left: 2.5rem; margin-bottom: 1rem;">
                         <div class="comment-avatar" style="width: 36px; height: 36px; font-size: 0.9rem;">
                             {{ sub.id_usuario.username|slice:":1"|upper|default:"U" }}
                         </div>
-                        <div class="comment-content-wrapper">
+                        <div class="comment-content-wrapper" style="width: 100%;">
                             <div class="comment-header">
                                 <span class="comment-author">{{ sub.id_usuario.username|default:"Usuario" }}</span>
                                 <span class="comment-date">{{ sub.created_at|date:"d/m/Y H:i" }}</span>
@@ -179,15 +201,21 @@
                             {% endif %}
 
                             {% if sub.imagen %}
-                                <img src="{{ sub.imagen.url }}" alt="Imagen adjunta" class="comment-img-attached">
+                                <img src="{{ sub.imagen.url }}" alt="Imagen adjunta" class="comment-img-attached" style="max-width: 250px; border-radius: 8px;">
                             {% endif %}
 
                             {% if foro.estado != 'ELIMINADO' %}
-                                <div class="comment-actions">
+                                <div class="comment-actions" style="margin-top: 0.5rem;">
                                     {% if request.user.is_authenticated and request.user != sub.id_usuario %}
-                                        <button type="button" class="btn-action-link danger" onclick="openReportModal('comentario', '{{ sub.id }}')">
-                                            <i class="fa-solid fa-flag"></i> Reportar
-                                        </button>
+                                        {% if sub.id in comentarios_reportados_ids %}
+                                            <span class="btn-action-link" style="color: #64748b; cursor: not-allowed;" title="Ya has reportado este comentario">
+                                                <i class="fa-solid fa-circle-check"></i> Reportado
+                                            </span>
+                                        {% else %}
+                                            <button type="button" class="btn-action-link danger" onclick="openReportModal('comentario', '{{ sub.id }}')">
+                                                <i class="fa-solid fa-flag"></i> Reportar
+                                            </button>
+                                        {% endif %}
                                     {% endif %}
 
                                     {% if request.user == foro.id_creador or request.user == sub.id_usuario %}
@@ -202,24 +230,24 @@
                 {% endif %}
             {% endfor %}
         {% empty %}
-            <p style="color: var(--color-text-secondary); text-align: center; padding: 2rem 0;">Aún no hay comentarios en esta discusión.</p>
+            <p style="color: var(--color-text-secondary); text-align: center; padding: 2rem 0;">Aún no hay comentarios en este foro.</p>
         {% endfor %}
     </div>
 
 </div>
 
-<!-- Modal de Reporte -->
-<div id="reportModal" class="report-modal-overlay" style="display: none;">
-    <div class="report-modal-content">
-        <div class="report-modal-header">
+<!-- Modal de Reportes -->
+<div id="reportModal" class="report-modal-overlay" style="display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.5); justify-content: center; align-items: center; z-index: 1000;">
+    <div class="report-modal-content" style="background: var(--color-surface, #fff); padding: 2rem; border-radius: 12px; max-width: 500px; width: 90%;">
+        <div class="report-modal-header" style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 1rem;">
             <h3><i class="fa-solid fa-triangle-exclamation" style="color: #ef4444;"></i> Crear Reporte</h3>
-            <button type="button" class="btn-close-modal" onclick="closeReportModal()">&times;</button>
+            <button type="button" class="btn-close-modal" onclick="closeReportModal()" style="background: none; border: none; font-size: 1.5rem; cursor: pointer;">&times;</button>
         </div>
         <form id="reportForm" method="POST" action="">
             {% csrf_token %}
             
-            <div class="report-form-group">
-                <label for="motivo">Motivo del reporte:</label>
+            <div class="report-form-group" style="margin-bottom: 1rem;">
+                <label for="motivo" style="display: block; margin-bottom: 0.5rem;">Motivo del reporte:</label>
                 <select name="motivo" id="motivo" class="search-input" style="width: 100%; padding: 0.6rem;" required>
                     <option value="" disabled selected>Selecciona una opción</option>
                     {% for clave, valor in motivos_reporte %}
@@ -229,8 +257,8 @@
             </div>
 
             <div class="report-form-group" style="margin-bottom: 1.5rem;">
-                <label for="comentario_adicional">Detalles adicionales:</label>
-                <textarea name="comentario_adicional" id="comentario_adicional" rows="3" class="search-input" style="width: 100%; padding: 0.6rem; resize: vertical;" placeholder="Explica brevemente la razón del reporte..."></textarea>
+                <label for="comentario_adicional" style="display: block; margin-bottom: 0.5rem;">Detalles adicionales:</label>
+                <textarea name="comentario_adicional" id="comentario_adicional" rows="3" class="search-input" style="width: 100%; padding: 0.6rem; resize: vertical;" placeholder="Explica brevemente la razón..."></textarea>
             </div>
 
             <div style="display: flex; justify-content: flex-end; gap: 0.8rem;">

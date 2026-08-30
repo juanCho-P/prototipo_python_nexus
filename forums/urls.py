@@ -6,14 +6,14 @@ urlpatterns = [
     path(
         '', 
         views.buscar_foro,
-        name='buscar_foro'),
-
+        name='buscar_foro'
+        ),
 
     path(
-        'foro/<int:foro_id>/editar/', 
-        views.editar_foro, 
-        name='editar_foro'
-    ),
+        'foro/<int:foro_id>/editar/',
+          views.editar_foro, 
+          name='editar_foro'
+        ),
 
     # Mis foros
     path(
@@ -72,6 +72,11 @@ urlpatterns = [
         views.reportar_contenido,
         name='reportar_contenido'
     ),
+
+    path(
+        '<int:pk>/reactivar/',
+          views.reactivar_foro, 
+          name='reactivar_foro'),
 
 
 ]

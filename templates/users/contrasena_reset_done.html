@@ -1,6 +1,54 @@
-<h1>Correo enviado</h1>
+{% load static %}
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.2/css/all.min.css">
+    <link rel="stylesheet" href="{% static 'auth.css' %}">
+    <title>Correo Enviado - Nexus</title>
+    <style>
+        .container {
+            min-height: 380px !important;
+            height: auto !important;
+            display: flex !important;
+            justify-content: center !important;
+            align-items: center !important;
+        }
+        .form-container.sign-in {
+            position: relative !important;
+            left: 0 !important;
+            width: 100% !important;
+            opacity: 1 !important;
+            z-index: 5 !important;
+            transform: none !important;
+            padding: 40px !important;
+            text-align: center;
+        }
+    </style>
+</head>
+<body>
 
-<p>
-    Si el correo está registrado,
-    recibirás un enlace para cambiar tu contraseña.
-</p>
+    <div class="container active" id="container">
+        <div class="form-container sign-in">
+            <div style="display: flex; flex-direction: column; align-items: center;">
+                <i class="fa-solid fa-paper-plane" style="font-size: 45px; color: #512da8; margin-bottom: 15px;"></i>
+                <h1>Correo Enviado</h1>
+                
+                <p style="font-size: 14px; color: #666; margin: 15px 0; line-height: 1.5;">
+                    Si la dirección que ingresaste está registrada en nuestro sistema, recibirás un enlace en unos minutos para restablecer tu contraseña.
+                </p>
+
+                <p style="font-size: 12px; color: #888; margin-bottom: 20px;">
+                    Revisa tu bandeja de entrada y la carpeta de spam o correo no deseado.
+                </p>
+
+                <a href="{% url 'login' %}" style="display: inline-block; padding: 10px 20px; background-color: #512da8; color: white; border-radius: 8px; text-decoration: none; font-weight: bold;">
+                    Volver al Inicio de Sesión
+                </a>
+            </div>
+        </div>
+    </div>
+
+</body>
+</html>

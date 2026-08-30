@@ -417,3 +417,64 @@
     background: var(--button-primary-hover);
     transform: translateY(-1px);
 }
+
+/* =========================================
+   RESPONSIVE DESIGN PARA MÓVILES
+   ========================================= */
+@media screen and (max-width: 768px) {
+    /* Ajustar contenedor principal y títulos */
+    .forums-explorer-container {
+        padding: 1rem 0.8rem;
+    }
+
+    .search-title {
+        font-size: 1.7rem;
+    }
+
+    .search-subtitle {
+        font-size: 0.85rem;
+        margin-bottom: 1.2rem;
+    }
+
+    /* Apilar los elementos del buscador en columna */
+    .search-inputs-group {
+        flex-direction: column;
+        gap: 0.8rem;
+        align-items: stretch;
+    }
+
+    /* Los selectores ocupan todo el ancho en móvil */
+    .category-select {
+        width: 100%;
+        text-align: left;
+    }
+
+    /* El contenedor del input de búsqueda se adapta al 100% */
+    .search-input-wrapper {
+        width: 100%;
+        min-width: 100%;
+    }
+
+    /* Reducir el padding derecho del input para que el texto no choque con el botón */
+    .search-input {
+        padding: 0.85rem 5.5rem 0.85rem 2.8rem;
+        font-size: 0.85rem;
+    }
+
+    /* Ajustar el botón de búsqueda para que no sea demasiado grande en pantallas pequeñas */
+    .search-btn {
+        padding: 0.5rem 1rem;
+        font-size: 0.8rem;
+        right: 4px;
+    }
+
+    /* Las tarjetas de los foros se adaptan a una columna fluida */
+    .forums-grid {
+        grid-template-columns: 1fr;
+        gap: 1.5rem;
+    }
+
+    .forum-card-overlay {
+        height: 380px;
+    }
+}

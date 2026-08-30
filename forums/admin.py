@@ -3,23 +3,17 @@ from .models import Foro, Comentario
 
 @admin.register(Foro)
 class ForoAdmin(admin.ModelAdmin):
-    list_display = ('id','titulo', 'descripcion', 'estado', 'created_at','imagen')
-    search_fields = ('titulo', 'descripcion', 'categoria')
-    list_filter = ('categoria', 'created_at')
-
-    list_filter = ('estado', 'created_at', 'categoria')
-
+    list_display = ('id', 'titulo', 'descripcion', 'estado', 'created_at', 'imagen')
     search_fields = ('titulo', 'descripcion')
+    list_filter = ('estado', 'created_at', 'categoria')
 
    
 @admin.register(Comentario)
 class ComentarioAdmin(admin.ModelAdmin):
-    list_display = ('id', 'id_foro', 'id_usuario', 'created_at', 'activo', 'created_at' , 'imagen')
-    search_fields = ('respuesta', 'id_usuario')
+    list_display = ('id', 'id_foro', 'id_usuario', 'activo', 'created_at', 'has_image')
+    search_fields = ('respuesta', 'id_usuario__username')
+    list_filter = ('activo', 'created_at')
 
-    @admin.display(boolean=True, description='imagen?')
+    @admin.display(boolean=True, description='¿Imagen?')
     def has_image(self, obj):
         return bool(obj.imagen)
-
-
-

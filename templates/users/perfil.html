@@ -3,7 +3,6 @@
 
 {% block title %}Mi Perfil{% endblock %}
 
-
 {% block extra_css %}
 <link rel="stylesheet" href="{% static 'perfil.css' %}">
 {% endblock %}
@@ -22,14 +21,20 @@
                 </div>
             {% endif %}
 
-           
             <a href="{% url 'editar_perfil' %}" class="avatar-edit-btn" title="Cambiar foto de perfil">
                 <i class="fa-solid fa-camera"></i>
             </a>
         </div>
 
         <div class="profile-main-info">
-            <h2>{{ usuario.nombres|default:usuario.username }}</h2>
+            <!-- Muestra Nombre y Apellido si existen; si no, el Username -->
+            <h2>
+                {% if usuario.nombres or usuario.apellidos %}
+                    {{ usuario.nombres }} {{ usuario.apellidos }}
+                {% else %}
+                    {{ usuario.username }}
+                {% endif %}
+            </h2>
             <p class="profile-username">@{{ usuario.username }}</p>
             
             <div class="profile-badges">
@@ -69,7 +74,14 @@
             <div class="info-list">
                 <div class="info-item">
                     <span class="info-label">Nombre completo</span>
-                    <span class="info-value">{{ usuario.nombres|default:"No especificado" }}</span>
+                    <!-- Concatenación explícita de nombres y apellidos -->
+                    <span class="info-value">
+                        {% if usuario.nombres or usuario.apellidos %}
+                            {{ usuario.nombres }} {{ usuario.apellidos }}
+                        {% else %}
+                            No especificado
+                        {% endif %}
+                    </span>
                 </div>
 
                 <div class="info-item">
@@ -108,7 +120,7 @@
                             <strong>Verificación de Email</strong>
                             <p>Reenvía el enlace si aún no has confirmado tu cuenta.</p>
                         </div>
-                       
+                        
                         <form action="{% url 'enviar_verificacion_email' %}" method="post">
                             {% csrf_token %}
                             <button type="submit" class="secondary-button">

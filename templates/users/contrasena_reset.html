@@ -1,13 +1,67 @@
-<h1>Recuperar contraseña</h1>
+{% load static %}
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.2/css/all.min.css">
+    <link rel="stylesheet" href="{% static 'auth.css' %}">
+    <title>Restablecer Contraseña - Nexus</title>
+    <style>
+        /* Ajustes para forzar la visibilidad del formulario en esta pantalla */
+        .container {
+            min-height: 400px !important;
+            height: auto !important;
+            display: flex !important;
+            justify-content: center !important;
+            align-items: center !important;
+        }
+        .form-container.sign-in {
+            position: relative !important;
+            left: 0 !important;
+            width: 100% !important;
+            opacity: 1 !important;
+            z-index: 5 !important;
+            transform: none !important;
+            padding: 40px !important;
+        }
+        .form-container form {
+            display: flex !important;
+            flex-direction: column !important;
+            align-items: center !important;
+            justify-content: center !important;
+            width: 100% !important;
+        }
+    </style>
+</head>
+<body>
 
-<form method="post">
+    <!-- Contenedor flotante para notificaciones -->
+    <div id="toast-container" class="toast-container"></div>
 
-    {% csrf_token %}
+    <div class="container active" id="container">
 
-    {{ form.as_p }}
+        <!-- Formulario de Recuperación -->
+        <div class="form-container sign-in">
+            <form id="form-reset" action="{% url 'password_reset' %}" method="POST">
+                {% csrf_token %}
+                <h1>Recuperar Contraseña</h1>
+                
+                <p style="font-size: 14px; color: #666; margin: 15px 0; text-align: center;">
+                    Ingresa tu correo electrónico registrado y te enviaremos un enlace para restablecer tu contraseña.
+                </p>
 
-    <button type="submit">
-        Enviar enlace
-    </button>
+                <input type="email" id="reset-email" name="email" placeholder="Correo electrónico" required>
 
-</form>
+                <button type="submit" style="margin-top: 15px;">Enviar Enlace</button>
+                
+                <a href="{% url 'login' %}" style="margin-top: 20px;">
+                    <i class="fa-solid fa-arrow-left"></i> Volver al Inicio de Sesión
+                </a>
+            </form>
+        </div>
+
+    </div>
+
+</body>
+</html>

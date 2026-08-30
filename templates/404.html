@@ -1,0 +1,26 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>404 - Página no encontrada</title>
+    <link rel="shortcut icon" href="{% static 'img/logo.png' %}" type="image/png">
+    
+    <link rel="stylesheet" href="{% static 'css/error/error.css' %}">
+</head>
+<body>
+    <div class="error-container">
+        <div class="error-card">
+            <div class="error-code">404</div>
+            <h1 class="error-title">Página no encontrada</h1>
+            <p class="error-description">
+                La página que estás buscando no existe, ha sido movida o la dirección ingresada es incorrecta.
+            </p>
+            <div class="error-actions">
+                <a href="/" class="error-btn">Volver al Inicio</a>
+            </div>
+        </div>
+    </div>
+</body>
+</html>

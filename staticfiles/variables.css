@@ -1,0 +1,49 @@
+@import url('https://fonts.googleapis.com/css2?family=Montserrat:wght@300;400;500;600;700&display=swap');
+
+:root {
+    /* Colores Principales */
+    --color-primary: #9B44F2;
+    --color-secondary: #666DF2;
+    --color-blue: #5298F2;
+    --color-cyan: #22DDF2;
+    --color-danger: #E63946;
+
+    /* Fondos y Superficies */
+    --color-background: #F7F8FC;
+    --color-surface: #FFFFFF;
+    --color-surface-hover: #F5F3FF;
+
+    /* Textos */
+    --color-text-primary: #262626;
+    --color-text-secondary: #5F6368;
+    --color-text-light: #FFFFFF;
+    --color-text-accent: #666DF2;
+
+    /* Bordes */
+    --color-border: #E5E7EB;
+    --color-border-hover: #9B44F2;
+
+    /* Botones específicos */
+    --button-primary: #666DF2;
+    --button-primary-hover: #9B44F2;
+    --button-secondary: #FFFFFF;
+    --button-secondary-hover: #F5F3FF;
+
+    /* Gradientes */
+    --gradient-primary: linear-gradient(135deg, #9B44F2 0%, #666DF2 50%, #5298F2 100%);
+    --gradient-accent: linear-gradient(135deg, #666DF2 0%, #22DDF2 100%);
+
+    /* Sombras y Bordes */
+    --shadow-card: 0 8px 25px rgba(38, 38, 38, 0.08);
+    --shadow-card-hover: 0 14px 35px rgba(102, 109, 242, 0.18);
+    --shadow-button: 0 6px 18px rgba(102, 109, 242, 0.25);
+    
+    --radius-small: 8px;
+    --radius-medium: 14px;
+    --radius-large: 20px;
+    --radius-pill: 999px;
+
+    /* Transiciones */
+    --transition-fast: 0.2s ease;
+    --transition-normal: 0.3s ease;
+}

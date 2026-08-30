@@ -5,6 +5,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Nexus | {% block title %}Dashboard{% endblock %}</title>
+    <link rel="shortcut icon" href="{% static 'img/logo.png' %}" type="image/png">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <link rel="stylesheet" href="{% static 'base.css' %}">
     {% block extra_css %}{% endblock %}
@@ -23,7 +24,7 @@
             <nav class="sidebar-nav">
                 <ul>
                     <li><a href="{% url 'dashboard' %}" class="sidebar-link"><i class="fa-solid fa-chart-pie"></i><span>Dashboard</span></a></li>
-                    <li><a href="{% url 'event_list' %}" class="sidebar-link"><i class="fa-solid fa-compass"></i><span>Descubrir Eventos</span></a></li>
+                    <li><a href="{% url 'buscar_eventos' %}" class="sidebar-link"><i class="fa-solid fa-compass"></i><span>Descubrir Eventos</span></a></li>
                     <li><a href="{% url 'crear_evento' %}" class="sidebar-link"><i class="fa-solid fa-calendar-plus"></i><span>Crear Evento</span></a></li>
                     <li><a href="{% url 'buscar_foro' %}" class="sidebar-link"><i class="fa-solid fa-comments"></i><span>Descubrir Foros</span></a></li>
                     <li><a href="{% url 'crear_foro' %}" class="sidebar-link"><i class="fa-solid fa-comment-medical"></i><span>Crear Foro</span></a></li>
@@ -71,18 +72,24 @@
                             <div class="popover-body" id="notifList">
                                 {% if notificaciones %}
                                     {% for notif in notificaciones %}
-                                        <div class="notif-item {% if not notif.leida %}unread{% endif %} {% if notif.tipo == 'warning' %}is-warning{% endif %}">
+                                        <div class="notif-item {% if not notif.leido %}unread{% endif %}">
                                             <div class="notif-icon">
-                                                {% if notif.tipo == 'warning' %}
-                                                    <i class="fa-solid fa-triangle-exclamation"></i>
-                                                {% else %}
-                                                    <i class="fa-solid fa-circle-info"></i>
-                                                {% endif %}
+                                                <i class="fa-solid fa-circle-info"></i>
                                             </div>
                                             <div class="notif-content">
                                                 <p class="notif-title">{{ notif.titulo }}</p>
                                                 <p class="notif-message">{{ notif.mensaje }}</p>
                                                 <span class="notif-time">{{ notif.created_at|timesince }}</span>
+                                            </div>
+                                            <div class="notif-actions" style="display: flex; gap: 5px; align-items: center;">
+                                                {% if not notif.leido %}
+                                                    <button type="button" class="btn-action mark-read" data-id="{{ notif.id }}" title="Marcar como leída" style="background:none; border:none; cursor:pointer; color: #28a745;">
+                                                        <i class="fa-solid fa-check"></i>
+                                                    </button>
+                                                {% endif %}
+                                                <button type="button" class="btn-action delete-notif" data-id="{{ notif.id }}" title="Eliminar" style="background:none; border:none; cursor:pointer; color: #dc3545;">
+                                                    <i class="fa-solid fa-trash"></i>
+                                                </button>
                                             </div>
                                         </div>
                                     {% endfor %}
@@ -122,47 +129,8 @@
     </div>
 
     <!-- JAVASCRIPT -->
-    <script>
-        // Toggle Sidebar
-        const sidebar = document.getElementById("sidebar");
-        document.getElementById("sidebarToggle").addEventListener("click", () => sidebar.classList.toggle("collapsed"));
-        document.getElementById("mobileMenu").addEventListener("click", () => sidebar.classList.toggle("mobile-open"));
-
-        // Modal Flotante de Notificaciones
-        const notifBtn = document.getElementById("notifBtn");
-        const notifPopover = document.getElementById("notifPopover");
-
-        notifBtn.addEventListener("click", (e) => {
-            e.stopPropagation();
-            notifPopover.classList.toggle("active");
-        });
-
-        document.addEventListener("click", (e) => {
-            if (!notifPopover.contains(e.target) && !notifBtn.contains(e.target)) {
-                notifPopover.classList.remove("active");
-            }
-        });
-
-        // Marcar Notificaciones como leídas AJAX
-        const markAllBtn = document.getElementById("markAllReadBtn");
-        if (markAllBtn) {
-            markAllBtn.addEventListener("click", () => {
-                fetch("{% url 'marcar_notificaciones_leidas' %}", {
-                    method: "POST",
-                    headers: {
-                        "X-CSRFToken": "{{ csrf_token }}",
-                        "Content-Type": "application/json"
-                    }
-                }).then(res => {
-                    if (res.ok) {
-                        const badge = document.getElementById("notifBadge");
-                        if (badge) badge.remove();
-                        document.querySelectorAll(".notif-item.unread").forEach(el => el.classList.remove("unread"));
-                    }
-                });
-            });
-        }
-    </script>
-    {% block extra_js %}{% endblock %}
+    
+    {% block extra_js %}
+    <script src="{% static 'js/base.js' %}"></script>{% endblock %}
 </body>
 </html>

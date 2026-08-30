@@ -1,45 +1,49 @@
 from django.contrib import messages
-
 from django.shortcuts import render, redirect, get_object_or_404
 from django.contrib.auth.decorators import login_required
 from django.utils import timezone
-from .models import Evento
+from .models import Evento, Reporte
 from .forms import EventoForm
 from notification.models import Notificacion
 from categorias.models import Categoria
 from django.db.models import Q, Count
 from django.core.paginator import Paginator
-from .models import Reporte
-from report.services import  usuario_ya_reporto
+from django.db import connection
+from django.contrib.contenttypes.models import ContentType
 
 @login_required
 def buscar_eventos(request):
-
     query = request.GET.get('q', '')
     categoria_id = request.GET.get('categoria', '')
     orden = request.GET.get('orden', 'proximos')
 
-    
-    eventos = Evento.objects.filter(estado='PUBLICADO').select_related('id_creador').prefetch_related('categoria', 'asistentes')
+    # 1. Filtrar eventos cuyo estado sea PUBLICADO y cuyo creador TENGA MENOS DE 3 STRIKES
+    eventos = Evento.objects.filter(
+        estado='PUBLICADO',
+        id_creador__strikes__lt=3
+    ).select_related('id_creador').prefetch_related('categoria', 'asistentes')
 
-   
+    # Actualizar estados vencidos
     for evento in eventos:
         actualizar_estado_evento(evento)
 
-    
+    # Volver a filtrar solo los que mantengan el estado 'PUBLICADO' tras la actualización
     eventos = eventos.filter(estado='PUBLICADO')
 
+    # 2. Búsqueda por texto (Título, Descripción, Ubicación)
     if query:
         eventos = eventos.filter(
             Q(titulo__icontains=query) | Q(descripcion__icontains=query) | Q(ubicacion__icontains=query)
         )
 
+    # 3. Filtrado por categoría
     if categoria_id:
         eventos = eventos.filter(categoria__id=categoria_id)
 
+    # 4. Anotación de total de asistentes
     eventos = eventos.annotate(total_asistentes=Count('asistentes'))
 
-   
+    # 5. Ordenamiento
     if orden == 'populares':
         eventos = eventos.order_by('-total_asistentes', 'f_inicio')
     elif orden == 'recientes':
@@ -47,6 +51,7 @@ def buscar_eventos(request):
     else:  
         eventos = eventos.order_by('f_inicio')
 
+    # 6. Paginación
     paginator = Paginator(eventos, 6)
     page_number = request.GET.get('page')
     page_obj = paginator.get_page(page_number)
@@ -60,12 +65,11 @@ def buscar_eventos(request):
         'now': timezone.now()
     })
 
-
 @login_required
 def crear_evento(request):
     if not request.user.email_verificado:
         messages.error(request, 'Debes verificar tu correo electrónico para crear un evento.')
-        return redirect('event_list')
+        return redirect('buscar_eventos')
 
     if request.method == 'POST':
         form = EventoForm(request.POST, request.FILES)
@@ -208,7 +212,7 @@ def cancelar_evento(request, pk):
 
         messages.success(request, 'El evento ha sido cancelado y se notificó a los participantes.')
 
-    return redirect('detalle_evento', pk=pk)
+    return redirect('evento_detalle', pk=pk)
 @login_required
 def reportar_evento(request, pk):
     evento = get_object_or_404(Evento, pk=pk)
@@ -221,7 +225,6 @@ def reportar_evento(request, pk):
    
     messages.info(request, 'Formulario de reporte en desarrollo.')
     return redirect('evento_detalle', pk=evento.pk) 
-
 
 @login_required
 def detalle_evento(request, pk):
@@ -236,26 +239,49 @@ def detalle_evento(request, pk):
 
     if not puede_ver:
         messages.error(request, 'No tienes permiso para ver este evento.')
-        return redirect('event_list')
+        return redirect('buscar_eventos')
 
     ya_asiste = evento.asistentes.filter(pk=request.user.pk).exists()
 
+    # Reemplaza la llamada a la función fantasma por esta consulta:
     ya_reporto = False
     if request.user.is_authenticated:
-        ya_reporto = usuario_ya_reporto(request.user, evento)
+        content_type = ContentType.objects.get_for_model(Evento)
+        ya_reporto = Reporte.objects.filter(
+            reportador=request.user,
+            content_type=content_type,
+            object_id=evento.pk
+        ).exists()
+
+    with connection.cursor() as cursor:
+        cursor.execute("SELECT fn_total_asistentes_evento(%s)", [evento.pk])
+        total_asistentes = cursor.fetchone()[0]
 
     context = {
         'evento': evento,
         'now': timezone.now(),
         'ya_asiste': ya_asiste,
         'ya_reporto': ya_reporto,
-        'total_asistentes': evento.asistentes.count(),
+        'total_asistentes': total_asistentes, 
         'es_creador': (evento.id_creador == request.user),
         'motivos_reporte': Reporte.MOTIVOS_CHOICES
     }
 
     return render(request, 'event/evento_detalle.html', context)
 
+@login_required
+def cancelar_asistencia(request, pk):
+    if request.method == 'POST':
+        evento = get_object_or_404(Evento, pk=pk)
+        
+        # Elimina al usuario de la relación ManyToMany
+        if request.user in evento.asistentes.all():
+            evento.asistentes.remove(request.user)
+            messages.success(request, f'Has cancelado tu asistencia al evento "{evento.titulo}".')
+        else:
+            messages.warning(request, 'No estabas registrado en este evento.')
+
+    return redirect('dashboard')
 
 
 # FUNCION AXILIAR PARA ACTUALIZAR LOS ESTADOS DE EVENTO
@@ -265,3 +291,5 @@ def actualizar_estado_evento(evento):
     if evento.estado == 'PUBLICADO' and evento.f_fin <= ahora:
         evento.estado = 'FINALIZADO'
         evento.save(update_fields=['estado'])
+
+

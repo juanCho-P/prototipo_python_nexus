@@ -2,12 +2,10 @@ from django.urls import path
 from . import views
 
 urlpatterns = [
-
-    # Buscar / listar eventos
     path(
         '',
         views.buscar_eventos,
-        name='event_list'
+        name='buscar_eventos'
     ),
 
     # Mis eventos
@@ -58,4 +56,13 @@ urlpatterns = [
         views.reportar_evento,
         name='reportar_evento'
     ),
+
+
+ path(
+     'cancelar-asistencia/<int:pk>/', 
+      views.cancelar_asistencia,
+       name='cancelar_asistencia'
+    ),
+
+ 
 ]
