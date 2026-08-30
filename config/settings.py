@@ -100,7 +100,9 @@ DATABASES = {
         'HOST': os.environ.get('DB_HOST', 'mysql-19afe62c-juanpablo9033-617e.e.aivencloud.com'),
         'PORT': os.environ.get('DB_PORT', '22104'),
         'OPTIONS': {
-            'ssl': {'ca': os.environ.get('DB_CA_PATH', 'ruta/al/certificado/ca.pem')},
+            'ssl': {
+                'ca': os.path.join(BASE_DIR, 'ca.pem'),
+            }
         }
     }
 }
