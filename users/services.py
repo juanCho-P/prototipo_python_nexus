@@ -1,30 +1,29 @@
-from django.core.mail import send_mail
-from django.urls import reverse
-from django.utils.http import urlsafe_base64_encode
-from django.utils.encoding import force_bytes
-from django.contrib.auth.tokens import default_token_generator
+import os
+import resend
+from django.conf import settings
 
-def enviar_correo_verificacion(request, usuario):
-    if usuario.email_verificado:
-        return
-
-    uid = urlsafe_base64_encode(force_bytes(usuario.pk))
-    token = default_token_generator.make_token(usuario)
-
-    enlace = request.build_absolute_uri(
-        reverse('verificar_email', kwargs={'uidb64': uid, 'token': token})
-    )
-
-    mensaje = (
-        f"Hola {usuario.username},\n\n"
-        "Por favor, haz clic en el siguiente enlace para verificar tu correo electrónico:\n\n"
-        f"{enlace}\n\n"
-        "Si no solicitaste esta verificación, puedes ignorar este mensaje."
-    )
-
-    send_mail(
-        'Verificación de correo electrónico',
-        mensaje,
-        None,
-        [usuario.email],
-    )
+def enviar_correo_verificacion(email_destino, token_verificacion):
+    resend.api_key = os.environ.get('RESEND_API_KEY')
+    
+    params = {
+        "from": "Nexus <onboarding@resend.dev>",
+        "to": [email_destino],
+        "subject": "Verificación de cuenta - Nexus",
+        "html": f"""
+            <div style="font-family: sans-serif; color: #333;">
+                <h2>¡Bienvenido a Nexus!</h2>
+                <p>Haz clic en el siguiente botón para verificar tu cuenta de correo:</p>
+                <a href="https://nexus-hpqz.onrender.com/users/verify/{token_verificacion}/" 
+                   style="background: #4f46e5; color: white; padding: 10px 20px; text-decoration: none; border-radius: 5px; display: inline-block;">
+                    Verificar correo
+                </a>
+            </div>
+        """,
+    }
+    
+    try:
+        response = resend.Emails.send(params)
+        return response
+    except Exception as e:
+        print(f"Error enviando correo con Resend: {e}")
+        return None
