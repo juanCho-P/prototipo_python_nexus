@@ -96,7 +96,7 @@ DATABASES = {
         'ENGINE': 'django.db.backends.mysql',
         'NAME': os.environ.get('DB_NAME', 'defaultdb'),
         'USER': os.environ.get('DB_USER', 'avnadmin'),
-        'PASSWORD': os.environ.get('DB_PASSWORD', 'AVNS_c7AXg1NzKrBmanyUw8w'),
+        'PASSWORD': os.environ.get('DB_PASSWORD', 'AVNS_c7AXglNzKrBmanyUw8w'),
         'HOST': os.environ.get('DB_HOST', 'mysql-19afe62c-juanpablo9033-617e.e.aivencloud.com'),
         'PORT': os.environ.get('DB_PORT', '22104'),
         'OPTIONS': {
