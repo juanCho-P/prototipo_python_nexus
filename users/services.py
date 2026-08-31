@@ -1,7 +1,7 @@
 import os
 import sib_api_v3_sdk
 from sib_api_v3_sdk.rest import ApiException
-
+from django.core.mail.backends.base import BaseEmailBackend
 
 def enviar_correo_verificacion(email_destino, enlace_verificacion):
     # Configurar la autenticación con tu Clave API de Brevo
@@ -12,7 +12,7 @@ def enviar_correo_verificacion(email_destino, enlace_verificacion):
         sib_api_v3_sdk.ApiClient(configuration)
     )
 
-    # Estructura del correo para la API de Brevo
+   
     sender = {
         "name": "Nexus App",
         "email": "equiponexus687@gmail.com"
@@ -51,3 +51,41 @@ def enviar_correo_verificacion(email_destino, enlace_verificacion):
     except ApiException as e:
         print(f"Error enviando correo con la API de Brevo: {e}")
         return None
+    
+
+
+
+
+
+class BrevoEmailBackend(BaseEmailBackend):
+  
+
+    def send_messages(self, email_messages):
+        configuration = sib_api_v3_sdk.Configuration()
+        configuration.api_key['api-key'] = os.environ.get('BREVO_API_KEY')
+        api_instance = sib_api_v3_sdk.TransactionalEmailsApi(
+            sib_api_v3_sdk.ApiClient(configuration)
+        )
+
+        sender = {"name": "Nexus App", "email": "equiponexus687@gmail.com"}
+        sent_count = 0
+
+        for message in email_messages:
+            
+            html_content = f"<pre style='font-family: sans-serif;'>{message.body}</pre>"
+
+            send_smtp_email = sib_api_v3_sdk.SendSmtpEmail(
+                sender=sender,
+                to=[{"email": r} for r in message.to],
+                subject=message.subject,
+                html_content=html_content,
+            )
+            try:
+                api_instance.send_transac_email(send_smtp_email)
+                sent_count += 1
+            except ApiException as e:
+                print(f"Error enviando correo con la API de Brevo: {e}")
+                if not self.fail_silently:
+                    raise
+
+        return sent_count

@@ -169,8 +169,9 @@ DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 
 
 LOGOUT_REDIRECT_URL = 'login'
-
-
+#configuracion Email
+EMAIL_BACKEND = 'core.email_backend.BrevoEmailBackend'
+DEFAULT_FROM_EMAIL = 'equiponexus687@gmail.com'
 
 
 
