@@ -1,13 +1,21 @@
-from django.core.mail import send_mail
+import os
+import sib_api_v3_sdk
+from sib_api_v3_sdk.rest import ApiException
 from django.conf import settings
 
 def enviar_correo_verificacion(email_destino, token_verificacion):
-    asunto = "Verificación de cuenta - Nexus"
+    # Configurar la autenticación con tu Clave API de Brevo
+    configuration = sib_api_v3_sdk.Configuration()
+    configuration.api_key['api-key'] = os.environ.get('EMAIL_HOST_PASSWORD') # O una variable dedicada como BREVO_API_KEY
     
-    # URL de verificación apuntando a tu despliegue en Render
+    api_instance = sib_api_v3_sdk.TransactionalEmailsApi(sib_api_v3_sdk.ApiClient(configuration))
+    
     enlace_verificacion = f"https://nexus-hpqz.onrender.com/users/verify/{token_verificacion}/"
     
-    mensaje_html = f"""
+    # Estructura del correo para la API de Brevo
+    sender = {"name": "Nexus App", "email": "equiponexus687@gmail.com"}
+    to = [{"email": email_destino}]
+    html_content = f"""
         <div style="font-family: sans-serif; color: #333;">
             <h2>¡Bienvenido a Nexus!</h2>
             <p>Haz clic en el siguiente botón para verificar tu cuenta de correo:</p>
@@ -18,17 +26,16 @@ def enviar_correo_verificacion(email_destino, token_verificacion):
         </div>
     """
     
+    send_smtp_email = sib_api_v3_sdk.SendSmtpEmail(
+        sender=sender,
+        to=to,
+        subject="Verificación de cuenta - Nexus",
+        html_content=html_content
+    )
+    
     try:
-        # send_mail requiere texto plano como alternativa y el parámetro html_message para contenido enriquecido
-        response = send_mail(
-            subject=asunto,
-            message="Haz clic en el enlace para verificar tu cuenta: " + enlace_verificacion,
-            from_email=settings.DEFAULT_FROM_EMAIL,
-            recipient_list=[email_destino],
-            html_message=mensaje_html,
-            fail_silently=False,
-        )
-        return response
-    except Exception as e:
-        print(f"Error enviando correo con Brevo SMTP: {e}")
+        api_response = api_instance.send_transac_email(send_smtp_email)
+        return api_response
+    except ApiException as e:
+        print(f"Error enviando correo con la API de Brevo: {e}")
         return None
