@@ -90,20 +90,20 @@
                 {% endfor %}
             </div>
 
-            <!-- Fechas (Grid Responsive de 2 columnas en pantallas grandes) -->
+                <!-- Fechas (Grid Responsive de 2 columnas en pantallas grandes) -->
             <div class="date-grid">
                 <div class="form-group-stellar">
-                    <label class="form-label-stellar" for="{{ form.fecha_inicio.id_for_label }}">Fecha y hora de inicio</label>
-                    <div class="input-field-wrapper">{{ form.fecha_inicio }}</div>
-                    {% for error in form.fecha_inicio.errors %}
+                    <label class="form-label-stellar" for="{{ form.f_inicio.id_for_label }}">Fecha y hora de inicio</label>
+                    <div class="input-field-wrapper">{{ form.f_inicio }}</div>
+                    {% for error in form.f_inicio.errors %}
                         <div class="stellar-error-message"><i class="fa-solid fa-triangle-exclamation"></i> {{ error }}</div>
                     {% endfor %}
                 </div>
 
                 <div class="form-group-stellar">
-                    <label class="form-label-stellar" for="{{ form.fecha_fin.id_for_label }}">Fecha y hora de fin</label>
-                    <div class="input-field-wrapper">{{ form.fecha_fin }}</div>
-                    {% for error in form.fecha_fin.errors %}
+                    <label class="form-label-stellar" for="{{ form.f_fin.id_for_label }}">Fecha y hora de fin</label>
+                    <div class="input-field-wrapper">{{ form.f_fin }}</div>
+                    {% for error in form.f_fin.errors %}
                         <div class="stellar-error-message"><i class="fa-solid fa-triangle-exclamation"></i> {{ error }}</div>
                     {% endfor %}
                 </div>
