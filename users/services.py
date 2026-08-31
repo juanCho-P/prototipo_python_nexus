@@ -6,7 +6,7 @@ from django.conf import settings
 def enviar_correo_verificacion(email_destino, token_verificacion):
     # Configurar la autenticación con tu Clave API de Brevo
     configuration = sib_api_v3_sdk.Configuration()
-    configuration.api_key['api-key'] = os.environ.get('EMAIL_HOST_PASSWORD') # O una variable dedicada como BREVO_API_KEY
+    configuration.api_key['api-key'] = os.environ.get('BREVO_API_KEY') 
     
     api_instance = sib_api_v3_sdk.TransactionalEmailsApi(sib_api_v3_sdk.ApiClient(configuration))
     
