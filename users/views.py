@@ -5,7 +5,8 @@ from django.contrib.auth.forms import PasswordChangeForm
 from django.contrib.auth.tokens import default_token_generator
 from django.contrib import messages
 from django.urls import reverse
-from django.utils.http import urlsafe_base64_decode
+from django.utils.http import urlsafe_base64_decode, urlsafe_base64_encode
+from django.utils.encoding import force_bytes
 from django.db.models import Count
 from django.utils import timezone
 from django.http import JsonResponse, HttpResponse
@@ -19,12 +20,23 @@ from .models import Usuario
 from .forms import RegistroForm, EditarPerfil
 from .services import enviar_correo_verificacion
 
+
+def generar_enlace_verificacion(request, user):
+    """Función auxiliar para generar la URL absoluta con el uid y el token de verificación."""
+    uid = urlsafe_base64_encode(force_bytes(user.pk))
+    token = default_token_generator.make_token(user)
+    return request.build_absolute_uri(
+        reverse('verificar_email', kwargs={'uidb64': uid, 'token': token})
+    )
+
+
 @login_required
 def marcar_notificaciones_leidas(request):
     if request.method == 'POST':
         Notificacion.objects.filter(usuario=request.user, leida=False).update(leida=True)
         return JsonResponse({'status': 'ok'})
     return JsonResponse({'status': 'error'}, status=400)
+
 
 @csrf_protect
 def login_view(request):
@@ -42,7 +54,7 @@ def login_view(request):
                 return JsonResponse({
                     'success': False,
                     'is_blocked': True,
-                    'message': f'Tu cuenta ha sido bloqueada por acumulación de strikes.'
+                    'message': 'Tu cuenta ha sido bloqueada por acumulación de strikes.'
                 }, status=403)
 
             if not user.email_verificado:
@@ -58,6 +70,7 @@ def login_view(request):
 
     return render(request, 'users/auth.html')
 
+
 def registro_view(request):
     if request.method == 'POST':
         form = RegistroForm(request.POST, request.FILES)
@@ -65,13 +78,17 @@ def registro_view(request):
             user = form.save(commit=False)
             user.set_password(form.cleaned_data['password'])
             user.save()
-            enviar_correo_verificacion(request, user)
+            
+            enlace = generar_enlace_verificacion(request, user)
+            enviar_correo_verificacion(user.email, enlace)
+            
             return JsonResponse({'success': True, 'message': 'Cuenta creada exitosamente. Verifica tu correo.'})
         
         error_msg = next(iter(form.errors.values()))[0]
         return JsonResponse({'success': False, 'message': error_msg}, status=400)
 
     return render(request, 'users/auth.html', {'form': RegistroForm()})
+
 
 @login_required
 def dashboard_view(request):
@@ -98,9 +115,11 @@ def dashboard_view(request):
     }
     return render(request, 'dashboard/dashboardUser.html', context)
 
+
 @login_required
 def perfil_view(request):
     return render(request, 'users/perfil.html', {'usuario': request.user})
+
 
 @login_required
 def editar_perfil(request):
@@ -113,7 +132,10 @@ def editar_perfil(request):
             if usuario.email != email_anterior:
                 usuario.email_verificado = False
                 usuario.save(update_fields=['email_verificado'])
-                enviar_correo_verificacion(request, usuario)
+                
+                enlace = generar_enlace_verificacion(request, usuario)
+                enviar_correo_verificacion(usuario.email, enlace)
+                
                 messages.warning(request, "Has cambiado tu correo. Verifica tu nueva dirección.")
             else:
                 messages.success(request, "Perfil actualizado correctamente.")
@@ -121,6 +143,7 @@ def editar_perfil(request):
     else:
         form = EditarPerfil(instance=usuario)
     return render(request, 'users/editar_perfil.html', {'form': form})
+
 
 @login_required
 def cambiar_contrasena(request):
@@ -134,6 +157,7 @@ def cambiar_contrasena(request):
     else:
         form = PasswordChangeForm(request.user)
     return render(request, 'users/cambiar_contrasena.html', {'form': form})
+
 
 def verificar_email(request, uidb64, token):
     try:
@@ -151,13 +175,16 @@ def verificar_email(request, uidb64, token):
     messages.error(request, "El enlace de verificación es inválido o ha expirado.")
     return redirect('auth')
 
+
 def logout_view(request):
     logout(request)
     messages.success(request, "Has cerrado sesión correctamente.")
     return redirect('auth')
 
+
 def auth_view(request):
     return render(request, 'users/auth.html')
+
 
 def provocate_500(request):
     return HttpResponse(1 / 0)

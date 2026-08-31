@@ -1,21 +1,15 @@
 import os
-
 import sib_api_v3_sdk
 from sib_api_v3_sdk.rest import ApiException
 
 
-def enviar_correo_verificacion(email_destino, token_verificacion):
-
+def enviar_correo_verificacion(email_destino, enlace_verificacion):
     # Configurar la autenticación con tu Clave API de Brevo
     configuration = sib_api_v3_sdk.Configuration()
     configuration.api_key['api-key'] = os.environ.get('BREVO_API_KEY')
 
     api_instance = sib_api_v3_sdk.TransactionalEmailsApi(
         sib_api_v3_sdk.ApiClient(configuration)
-    )
-
-    enlace_verificacion = (
-        f"https://nexus-hpqz.onrender.com/users/verify/{token_verificacion}/"
     )
 
     # Estructura del correo para la API de Brevo
