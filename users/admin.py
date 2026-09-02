@@ -32,6 +32,7 @@ class UsuarioAdmin(admin.ModelAdmin):
         'email_verificado',
         'is_active',
         'strikes'
+        ''
     )
 
 @admin.register(Rol)

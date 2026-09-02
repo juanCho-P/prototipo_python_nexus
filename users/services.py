@@ -4,7 +4,7 @@ from sib_api_v3_sdk.rest import ApiException
 from django.core.mail.backends.base import BaseEmailBackend
 
 def enviar_correo_verificacion(email_destino, enlace_verificacion):
-    # Configurar la autenticación con tu Clave API de Brevo
+   
     configuration = sib_api_v3_sdk.Configuration()
     configuration.api_key['api-key'] = os.environ.get('BREVO_API_KEY')
 

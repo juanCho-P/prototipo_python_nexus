@@ -27,10 +27,10 @@ MEDIA_ROOT = os.path.join(BASE_DIR, 'media')        # Carpeta donde se almacenar
 # See https://docs.djangoproject.com/en/6.0/howto/deployment/checklist/
 
 # SECURITY WARNING: keep the secret key used in production secret!
-SECRET_KEY = os.environ.get('SECRET_KEY', 'django-insecure-53@d##$rcl$=!-x**lf041(+r6uhkoi#$ah9ol_0dbnx9&8vsm')
+SECRET_KEY = os.environ.get('SECRET_KEY')
 
 # SECURITY WARNING: don't run with debug turned on in production!
-DEBUG = os.environ.get('DEBUG', 'False') == 'False'
+DEBUG = os.environ.get('DEBUG', 'False') == 'True'
 
 # Hosts permitidos dinámicos por entorno
 ALLOWED_HOSTS = ['nexus-hpqz.onrender.com', 'localhost', '127.0.0.1']
@@ -67,7 +67,7 @@ MIDDLEWARE = [
     'django.contrib.auth.middleware.AuthenticationMiddleware',
     'django.contrib.messages.middleware.MessageMiddleware',
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
-     'users.middleware.InactivityTimeoutMiddleware',
+    'users.middleware.InactivityTimeoutMiddleware',
 ]
 INACTIVITY_TIMEOUT = 900
 ROOT_URLCONF = 'config.urls'
@@ -96,11 +96,11 @@ WSGI_APPLICATION = 'config.wsgi.application'
 DATABASES = {
     'default': {
         'ENGINE': 'django.db.backends.mysql',
-        'NAME': os.environ.get('DB_NAME', 'defaultdb'),
-        'USER': os.environ.get('DB_USER', 'avnadmin'),
-        'PASSWORD': os.environ.get('DB_PASSWORD', 'AVNS_c7AXglNzKrBmanyUw8w'),
-        'HOST': os.environ.get('DB_HOST', 'mysql-19afe62c-juanpablo9033-617e.e.aivencloud.com'),
-        'PORT': os.environ.get('DB_PORT', '22104'),
+        'NAME': os.environ.get('DB_NAME'),
+        'USER': os.environ.get('DB_USER'),
+        'PASSWORD': os.environ.get('DB_PASSWORD'),
+        'HOST': os.environ.get('DB_HOST'),
+        'PORT': os.environ.get('DB_PORT'),
         'OPTIONS': {
             'ssl': {
                 'ca': os.path.join(BASE_DIR, 'ca.pem'),

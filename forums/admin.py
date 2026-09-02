@@ -10,7 +10,7 @@ class ForoAdmin(admin.ModelAdmin):
    
 @admin.register(Comentario)
 class ComentarioAdmin(admin.ModelAdmin):
-    list_display = ('id', 'id_foro', 'id_usuario', 'activo', 'created_at', 'has_image')
+    list_display = ('id', 'id_foro', 'id_usuario', 'activo', 'created_at', 'has_image','contenido')
     search_fields = ('respuesta', 'id_usuario__username')
     list_filter = ('activo', 'created_at')
 

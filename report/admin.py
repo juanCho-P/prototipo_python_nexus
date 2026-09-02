@@ -35,7 +35,7 @@ class ReporteAdmin(admin.ModelAdmin):
         'reportador', 
         'reportado', 
         'content_type', 
-        'ver_contenido',  # Columna personalizada para inspeccionar el texto
+        'ver_contenido',  
         'motivo', 
         'estado', 
         'created_at'
@@ -43,6 +43,7 @@ class ReporteAdmin(admin.ModelAdmin):
     list_filter = ('estado', 'content_type', 'created_at')
     search_fields = ('reportador__username', 'reportado__username', 'motivo')
     actions = [aprobar_reportes_action, rechazar_reportes_action]
+
 
     def ver_contenido(self, obj):
         if obj.contenido_objeto:
