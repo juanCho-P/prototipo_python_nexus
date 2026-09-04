@@ -17,41 +17,40 @@ def buscar_eventos(request):
     categoria_id = request.GET.get('categoria', '')
     orden = request.GET.get('orden', 'proximos')
 
-    # 1. Filtrar eventos cuyo estado sea PUBLICADO y cuyo creador TENGA MENOS DE 3 STRIKES
+    # 1. Actualizar en bloque los eventos PUBLICADOS ya vencidos (1 sola query)
+    Evento.objects.filter(
+        estado='PUBLICADO',
+        f_fin__lte=timezone.now()
+    ).update(estado='FINALIZADO')
+
+    # 2. Filtrar eventos PUBLICADOS de creadores con menos de 3 strikes
     eventos = Evento.objects.filter(
         estado='PUBLICADO',
         id_creador__strikes__lt=3
     ).select_related('id_creador').prefetch_related('categoria', 'asistentes')
 
-    # Actualizar estados vencidos
-    for evento in eventos:
-        actualizar_estado_evento(evento)
-
-    # Volver a filtrar solo los que mantengan el estado 'PUBLICADO' tras la actualización
-    eventos = eventos.filter(estado='PUBLICADO')
-
-    # 2. Búsqueda por texto (Título, Descripción, Ubicación)
+    # 3. Búsqueda por texto
     if query:
         eventos = eventos.filter(
             Q(titulo__icontains=query) | Q(descripcion__icontains=query) | Q(ubicacion__icontains=query)
         )
 
-    # 3. Filtrado por categoría
+    # 4. Filtrado por categoría
     if categoria_id:
         eventos = eventos.filter(categoria__id=categoria_id)
 
-    # 4. Anotación de total de asistentes
+    # 5. Anotación de total de asistentes
     eventos = eventos.annotate(total_asistentes=Count('asistentes'))
 
-    # 5. Ordenamiento
+    # 6. Ordenamiento
     if orden == 'populares':
         eventos = eventos.order_by('-total_asistentes', 'f_inicio')
     elif orden == 'recientes':
         eventos = eventos.order_by('-created_at')
-    else:  
+    else:
         eventos = eventos.order_by('f_inicio')
 
-    # 6. Paginación
+    # 7. Paginación
     paginator = Paginator(eventos, 6)
     page_number = request.GET.get('page')
     page_obj = paginator.get_page(page_number)
@@ -96,13 +95,16 @@ def crear_evento(request):
 
 @login_required
 def mis_eventos(request):
+    Evento.objects.filter(
+        id_creador=request.user,
+        estado='PUBLICADO',
+        f_fin__lte=timezone.now()
+    ).update(estado='FINALIZADO')
+
     eventos = Evento.objects.filter(
         id_creador=request.user
     ).order_by('f_inicio')
 
-    for evento in eventos: 
-        actualizar_estado_evento(evento)
-    
     return render(request, 'event/mis_eventos.html', {
         'eventos': eventos,
         'now': timezone.now()
@@ -188,7 +190,7 @@ def cancelar_evento(request, pk):
    
     if evento.id_creador != request.user:
         messages.error(request, 'No tienes permiso para cancelar este evento.')
-        return redirect('detalle_evento', pk=pk)
+        return redirect('evento_detalle', pk=pk)
 
     if request.method == 'POST':
         
@@ -213,6 +215,8 @@ def cancelar_evento(request, pk):
         messages.success(request, 'El evento ha sido cancelado y se notificó a los participantes.')
 
     return redirect('evento_detalle', pk=pk)
+
+
 @login_required
 def reportar_evento(request, pk):
     evento = get_object_or_404(Evento, pk=pk)

@@ -82,7 +82,7 @@ def detalle_foro(request, foro_id):
             comentario_padre=comentario_padre
         )
 
-        # Notificaciones optimizadas
+        
         usuarios_a_notificar = set()
         usuarios_guardados = ForoGuardado.objects.filter(foro=foro).exclude(usuario=request.user).values_list('usuario_id', flat=True)
         usuarios_a_notificar.update(usuarios_guardados)
@@ -99,17 +99,9 @@ def detalle_foro(request, foro_id):
             )
             for usr_id in usuarios_a_notificar
         ]
-        
+
         if notificaciones:
             Notificacion.objects.bulk_create(notificaciones)
-
-        # Procedimiento almacenado opcional si se requiere mantener
-        with connection.cursor() as cursor:
-            cursor.callproc('sp_notificar_usuarios_foro', [
-                foro.id,
-                request.user.pk,
-                f"Nuevo comentario en el foro '{foro.titulo}'."
-            ])
 
         messages.success(request, 'Comentario publicado correctamente.')
         return redirect('foro_detalle', foro_id=foro.id)
@@ -158,7 +150,6 @@ def detalle_foro(request, foro_id):
             'comentarios_reportados_ids': comentarios_reportados_ids,
         }
     )
-
 
 # ============================================================
 # VER TODOS LOS FOROS / BUSCAR

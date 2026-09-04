@@ -20,7 +20,7 @@ from .models import Usuario
 from .forms import RegistroForm, EditarPerfil
 from .services import enviar_correo_verificacion
 
-
+# funcion axiliar
 def generar_enlace_verificacion(request, user):
     """Función auxiliar para generar la URL absoluta con el uid y el token de verificación."""
     uid = urlsafe_base64_encode(force_bytes(user.pk))
