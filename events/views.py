@@ -181,7 +181,7 @@ def unirse_evento(request, pk):
 
     return redirect('evento_detalle', pk=evento.pk)
 
-# Importa tu modelo de notificaciones
+
 
 @login_required
 def cancelar_evento(request, pk):
@@ -247,7 +247,6 @@ def detalle_evento(request, pk):
 
     ya_asiste = evento.asistentes.filter(pk=request.user.pk).exists()
 
-    # Reemplaza la llamada a la función fantasma por esta consulta:
     ya_reporto = False
     if request.user.is_authenticated:
         content_type = ContentType.objects.get_for_model(Evento)
@@ -278,7 +277,6 @@ def cancelar_asistencia(request, pk):
     if request.method == 'POST':
         evento = get_object_or_404(Evento, pk=pk)
         
-        # Elimina al usuario de la relación ManyToMany
         if request.user in evento.asistentes.all():
             evento.asistentes.remove(request.user)
             messages.success(request, f'Has cancelado tu asistencia al evento "{evento.titulo}".')

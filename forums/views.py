@@ -254,7 +254,7 @@ def eliminar_foro(request, foro_id):
 def reactivar_foro(request, pk):
     if request.method == 'POST':
         foro = get_object_or_404(Foro, pk=pk, id_creador=request.user)
-        foro.estado = 'PUBLICADO'  # Se alinea con los choices del modelo
+        foro.estado = 'PUBLICADO'  
         foro.save(update_fields=['estado'])
         
         messages.success(request, f'El foro "{foro.titulo}" ha sido reactivado.')
@@ -292,7 +292,6 @@ def eliminar_publicacion(request, pub_id):
 @login_required
 def reportar_contenido(request):
     if request.method == 'POST':
-        # Lógica de reporte usando ContentTypes
         messages.success(request, 'Reporte recibido correctamente.')
     return redirect('buscar_foro')
 
